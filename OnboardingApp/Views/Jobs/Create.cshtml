@@ -36,6 +36,41 @@
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
+
+    <div class="mb-3">
+        <label asp-for="StartDate" class="form-label"></label>
+        <input asp-for="StartDate" class="form-control" type="date" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Client Evaluation</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="true" id="clientEvalYes" />
+            <label class="form-check-label" for="clientEvalYes">Yes</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="false" id="clientEvalNo" />
+            <label class="form-check-label" for="clientEvalNo">No</label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ClientContract" class="form-label"></label>
+        <select asp-for="ClientContract" class="form-select" asp-items="new SelectList(ViewBag.ClientContracts)">
+            <option value="">-- Select Contract --</option>
+        </select>
+        <span asp-validation-for="ClientContract" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WorkModel" class="form-label"></label>
+        <select asp-for="WorkModel" class="form-select" asp-items="new SelectList(ViewBag.WorkModels)">
+            <option value="">-- Select Work Model --</option>
+        </select>
+        <span asp-validation-for="WorkModel" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-primary">Create</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

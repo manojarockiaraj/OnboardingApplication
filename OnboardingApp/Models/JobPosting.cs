@@ -21,4 +21,17 @@ public class JobPosting
     public string Location { get; set; } = string.Empty;
 
     public string Description { get; set; } = string.Empty;
+
+    [Display(Name = "Start Date")]
+    [DataType(DataType.Date)]
+    public DateTime? StartDate { get; set; }
+
+    [Display(Name = "Client Evaluation")]
+    public bool ClientEvaluation { get; set; }
+
+    [Display(Name = "Client Contract")]
+    public string ClientContract { get; set; } = string.Empty; // e.g. "Multicapability", "ESFA"
+
+    [Display(Name = "Work Model")]
+    public string WorkModel { get; set; } = string.Empty; // e.g. "Hybrid", "Remote"
 }

@@ -12,6 +12,12 @@ public class JobsController : Controller
         new JobPosting { Id = 2, Title = "Frontend Developer", Skills = "JavaScript, React, CSS", ClientName = "Beta LLC", ClientContact = "contact@beta.com", Location = "Coventry", Description = "Work on UI components" }
     };
 
+    private void PopulateDropdowns()
+    {
+        ViewBag.ClientContracts = new List<string> { "Multicapability", "ESFA" };
+        ViewBag.WorkModels = new List<string> { "Hybrid", "Remote" };
+    }
+
     public IActionResult Index()
     {
         return View(_jobs);
@@ -21,6 +27,7 @@ public class JobsController : Controller
     {
         var job = _jobs.FirstOrDefault(j => j.Id == id);
         if (job == null) return NotFound();
+        PopulateDropdowns();
         return View(job);
     }
 
@@ -29,7 +36,11 @@ public class JobsController : Controller
     public IActionResult Edit(int id, JobPosting updated)
     {
         if (id != updated.Id) return BadRequest();
-        if (!ModelState.IsValid) return View(updated);
+        if (!ModelState.IsValid)
+        {
+            PopulateDropdowns();
+            return View(updated);
+        }
 
         var job = _jobs.FirstOrDefault(j => j.Id == id);
         if (job == null) return NotFound();
@@ -41,12 +52,17 @@ public class JobsController : Controller
         job.ClientContact = updated.ClientContact;
         job.Location = updated.Location;
         job.Description = updated.Description;
+        job.StartDate = updated.StartDate;
+        job.ClientEvaluation = updated.ClientEvaluation;
+        job.ClientContract = updated.ClientContract;
+        job.WorkModel = updated.WorkModel;
 
         return RedirectToAction(nameof(Index));
     }
 
     public IActionResult Create()
     {
+        PopulateDropdowns();
         return View(new JobPosting());
     }
 
@@ -54,7 +70,11 @@ public class JobsController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Create(JobPosting job)
     {
-        if (!ModelState.IsValid) return View(job);
+        if (!ModelState.IsValid)
+        {
+            PopulateDropdowns();
+            return View(job);
+        }
         job.Id = _jobs.Any() ? _jobs.Max(j => j.Id) + 1 : 1;
         _jobs.Add(job);
         return RedirectToAction(nameof(Index));
