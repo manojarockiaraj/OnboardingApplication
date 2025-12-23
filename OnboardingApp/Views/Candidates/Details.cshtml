@@ -1,0 +1,64 @@
+@model OnboardingApp.Models.Candidate
+@{
+    ViewData["Title"] = "Candidate Details";
+}
+
+<h1>@Model.Name</h1>
+<div class="mb-3">
+    <strong>Skills:</strong> @Model.Skills
+</div>
+<div class="mb-3">
+    <strong>Email:</strong> @Model.Email
+</div>
+<div class="mb-3">
+    <strong>Phone:</strong> @Model.Phone
+</div>
+<div class="mb-3">
+    <strong>Location:</strong> @Model.Location
+</div>
+<div class="mb-3">
+    <strong>Summary:</strong>
+    <p>@Model.Summary</p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<h3>Statuses</h3>
+<table class="table">
+    <tbody>
+        <tr>
+            <th>Resume Filter</th>
+            <td>@Model.ResumeFilterStatus</td>
+        </tr>
+        <tr>
+            <th>Level 1 Interview</th>
+            <td>@Model.Level1Status</td>
+        </tr>
+        <tr>
+            <th>Level 2 Interview</th>
+            <td>@Model.Level2Status</td>
+        </tr>
+        <tr>
+            <th>Final Status</th>
+            <td>@Model.FinalStatus</td>
+        </tr>
+        <tr>
+            <th>BPSS Status</th>
+            <td>@Model.BpssStatus</td>
+        </tr>
+    </tbody>
+</table>
+
+<form asp-action="SubmitOnboarding" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-success" @(Model.FinalStatus == OnboardingApp.Models.StageStatus.Passed && Model.BpssStatus == OnboardingApp.Models.StageStatus.Passed ? "" : "disabled")>Submit Onboarding Request</button>
+    <a class="btn btn-primary" asp-action="EditStatus" asp-route-id="@Model.Id">Edit Status</a>
+    <a class="btn btn-secondary" asp-action="Index">Back</a>
+</form>

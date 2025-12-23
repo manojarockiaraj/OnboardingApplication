@@ -1,0 +1,42 @@
+@model OnboardingApp.Models.Candidate
+@{
+    ViewData["Title"] = "Edit Candidate Status";
+}
+
+<h1>Edit Status for @Model.Name</h1>
+
+<form asp-action="EditStatus" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="ResumeFilterStatus" class="form-label"></label>
+        <select asp-for="ResumeFilterStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Level1Status" class="form-label"></label>
+        <select asp-for="Level1Status" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Level2Status" class="form-label"></label>
+        <select asp-for="Level2Status" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FinalStatus" class="form-label"></label>
+        <select asp-for="FinalStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BpssStatus" class="form-label"></label>
+        <select asp-for="BpssStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Status</button>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

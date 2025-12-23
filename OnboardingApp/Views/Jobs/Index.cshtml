@@ -1,0 +1,38 @@
+@model IEnumerable<OnboardingApp.Models.JobPosting>
+@{
+    ViewData["Title"] = "JobPosting";
+}
+
+<h1>JobPosting</h1>
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New Job</a>
+    <a class="btn btn-secondary" asp-controller="Candidates" asp-action="Index">View Candidates</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Skills</th>
+            <th>Client</th>
+            <th>Contact</th>
+            <th>Location</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var job in Model)
+    {
+        <tr>
+            <td>@job.Title</td>
+            <td>@job.Skills</td>
+            <td>@job.ClientName</td>
+            <td>@job.ClientContact</td>
+            <td>@job.Location</td>
+            <td>
+                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@job.Id">Edit</a>
+                <a class="btn btn-sm btn-info" asp-controller="Candidates" asp-action="Index" asp-route-jobId="@job.Id">Candidates</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
