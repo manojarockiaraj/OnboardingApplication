@@ -8,8 +8,8 @@ public class JobsController : Controller
     // In-memory list to simulate data store
     private static readonly List<JobPosting> _jobs = new List<JobPosting>
     {
-        new JobPosting { Id = 1, Title = "Software Engineer", Skills = "C#, ASP.NET Core, SQL", ClientName = "Acme Corp", ClientContact = "acme@example.com", Location = "London", Description = "Backend developer for API" },
-        new JobPosting { Id = 2, Title = "Frontend Developer", Skills = "JavaScript, React, CSS", ClientName = "Beta LLC", ClientContact = "contact@beta.com", Location = "Coventry", Description = "Work on UI components" }
+        new JobPosting { Id = 1, Title = "Software Engineer", Skills = "C#, ASP.NET Core, SQL", ClientName = "DFE", ClientContact = "acme@example.com", Location = "London", Description = "Backend developer for API" },
+        new JobPosting { Id = 2, Title = "Frontend Developer", Skills = "JavaScript, React, CSS", ClientName = "DEFRA", ClientContact = "contact@beta.com", Location = "Coventry", Description = "Work on UI components" }
     };
 
     public IActionResult Index()
