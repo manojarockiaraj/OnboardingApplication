@@ -37,7 +37,7 @@ else
             <td>@c.Phone</td>
             <td>@c.Location</td>
             <td>
-                <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@c.Id">Details</a>
+                <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@c.Id" asp-route-jobId="@jobId">Details</a>
             </td>
         </tr>
     }

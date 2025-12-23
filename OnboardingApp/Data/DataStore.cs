@@ -17,4 +17,7 @@ public static class DataStore
         new Candidate { Id = 2, Name = "Bob Smith", Skills = "JavaScript, React, CSS", Email = "bob@example.com", Phone = "555-0123", Location = "Coventry", Summary = "Frontend specialist", ResumeFilterStatus = StageStatus.Passed, Level1Status = StageStatus.Pending },
         new Candidate { Id = 3, Name = "Carol Lee", Skills = "C#, ASP.NET Core, JavaScript", Email = "carol@example.com", Phone = "555-0155", Location = "Coventry", Summary = "Full-stack developer" }
     };
+
+    // Registered users (passwords stored as hashes)
+    public static readonly List<User> Users = new List<User>();
 }

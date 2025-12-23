@@ -20,14 +20,21 @@ public class Candidate
 
     public string Summary { get; set; } = string.Empty;
 
+    // Interviewer names
+    [Display(Name = "Cognizant Internal Interviewer Name")]
+    public string CTSInternalInterviewerName { get; set; } = string.Empty;
+
+    [Display(Name = "Client Interviewer Name")]
+    public string ClientInterviewerName { get; set; } = string.Empty;
+
     // Status fields
     [Display(Name = "Resume Filter")]
     public StageStatus ResumeFilterStatus { get; set; } = StageStatus.Unknown;
 
-    [Display(Name = "Level 1 Interview")]
+    [Display(Name = "Cognizant Interview")]
     public StageStatus Level1Status { get; set; } = StageStatus.Unknown;
 
-    [Display(Name = "Level 2 Interview")]
+    [Display(Name = "Client Interview")]
     public StageStatus Level2Status { get; set; } = StageStatus.Unknown;
 
     [Display(Name = "Final Status")]

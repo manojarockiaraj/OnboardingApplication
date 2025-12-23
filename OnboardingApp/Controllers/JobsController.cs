@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using OnboardingApp.Models;
+using OnboardingApp.Data;
 
 namespace OnboardingApp.Controllers;
 
 public class JobsController : Controller
 {
-    // In-memory list to simulate data store
-    private static readonly List<JobPosting> _jobs = new List<JobPosting>
-    {
-        new JobPosting { Id = 1, Title = "Software Engineer", Skills = "C#, ASP.NET Core, SQL", ClientName = "Acme Corp", ClientContact = "acme@example.com", Location = "London", Description = "Backend developer for API" },
-        new JobPosting { Id = 2, Title = "Frontend Developer", Skills = "JavaScript, React, CSS", ClientName = "Beta LLC", ClientContact = "contact@beta.com", Location = "Coventry", Description = "Work on UI components" }
-    };
-
     private void PopulateDropdowns()
     {
         ViewBag.ClientContracts = new List<string> { "Multicapability", "ESFA" };
@@ -20,12 +14,12 @@ public class JobsController : Controller
 
     public IActionResult Index()
     {
-        return View(_jobs);
+        return View(DataStore.Jobs);
     }
 
     public IActionResult Edit(int id)
     {
-        var job = _jobs.FirstOrDefault(j => j.Id == id);
+        var job = DataStore.Jobs.FirstOrDefault(j => j.Id == id);
         if (job == null) return NotFound();
         PopulateDropdowns();
         return View(job);
@@ -42,7 +36,7 @@ public class JobsController : Controller
             return View(updated);
         }
 
-        var job = _jobs.FirstOrDefault(j => j.Id == id);
+        var job = DataStore.Jobs.FirstOrDefault(j => j.Id == id);
         if (job == null) return NotFound();
 
         // update fields
@@ -75,8 +69,8 @@ public class JobsController : Controller
             PopulateDropdowns();
             return View(job);
         }
-        job.Id = _jobs.Any() ? _jobs.Max(j => j.Id) + 1 : 1;
-        _jobs.Add(job);
+        job.Id = DataStore.Jobs.Any() ? DataStore.Jobs.Max(j => j.Id) + 1 : 1;
+        DataStore.Jobs.Add(job);
         return RedirectToAction(nameof(Index));
     }
 }

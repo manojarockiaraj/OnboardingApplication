@@ -36,37 +36,78 @@ public class CandidatesController : Controller
         return View(candidates);
     }
 
-    public IActionResult Details(int id)
+    public IActionResult Details(int id, int? jobId)
     {
         var candidate = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
         if (candidate == null) return NotFound();
+
+        ViewData["JobId"] = jobId;
+        if (jobId.HasValue)
+        {
+            var job = DataStore.Jobs.FirstOrDefault(j => j.Id == jobId.Value);
+            if (job != null)
+            {
+                ViewData["JobClientEvaluation"] = job.ClientEvaluation;
+                ViewData["JobTitle"] = job.Title;
+            }
+        }
+
         return View(candidate);
     }
 
-    public IActionResult EditStatus(int id)
+    public IActionResult EditStatus(int id, int? jobId)
     {
         var candidate = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
         if (candidate == null) return NotFound();
+
+        ViewData["JobId"] = jobId;
+        if (jobId.HasValue)
+        {
+            var job = DataStore.Jobs.FirstOrDefault(j => j.Id == jobId.Value);
+            if (job != null)
+            {
+                ViewData["JobClientEvaluation"] = job.ClientEvaluation;
+            }
+        }
+
         return View(candidate);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult EditStatus(int id, Candidate updated)
+    public IActionResult EditStatus(int id, Candidate updated, int? jobId)
     {
         if (id != updated.Id) return BadRequest();
-        if (!ModelState.IsValid) return View(updated);
+
+        if (!ModelState.IsValid)
+        {
+            ViewData["JobId"] = jobId;
+            if (jobId.HasValue)
+            {
+                var job = DataStore.Jobs.FirstOrDefault(j => j.Id == jobId.Value);
+                if (job != null)
+                {
+                    ViewData["JobClientEvaluation"] = job.ClientEvaluation;
+                }
+            }
+            return View(updated);
+        }
 
         var candidate = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
         if (candidate == null) return NotFound();
 
+        candidate.Name = updated.Name;
         candidate.ResumeFilterStatus = updated.ResumeFilterStatus;
         candidate.Level1Status = updated.Level1Status;
         candidate.Level2Status = updated.Level2Status;
         candidate.FinalStatus = updated.FinalStatus;
         candidate.BpssStatus = updated.BpssStatus;
 
-        return RedirectToAction(nameof(Details), new { id = candidate.Id });
+        // Save interviewer names
+        candidate.CTSInternalInterviewerName = updated.CTSInternalInterviewerName;
+        candidate.ClientInterviewerName = updated.ClientInterviewerName;
+
+        return RedirectToAction(nameof(Details), new { id = candidate.Id, jobId = jobId });
     }
 
     [HttpPost]
