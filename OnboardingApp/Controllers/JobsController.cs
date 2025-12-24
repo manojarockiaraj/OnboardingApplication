@@ -1,25 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
 using OnboardingApp.Models;
 using OnboardingApp.Data;
+using Microsoft.EntityFrameworkCore;
+using OnboardingApp.Repositories;
 
 namespace OnboardingApp.Controllers;
 
 public class JobsController : Controller
 {
+    private readonly IJobRepository _repo;
+
+    public JobsController(IJobRepository repo)
+    {
+        _repo = repo;
+    }
+
     private void PopulateDropdowns()
     {
         ViewBag.ClientContracts = new List<string> { "Multicapability", "ESFA" };
         ViewBag.WorkModels = new List<string> { "Hybrid", "Remote" };
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View(DataStore.Jobs);
+        var jobs = await _repo.GetAllAsync();
+        return View(jobs);
     }
 
-    public IActionResult Edit(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        var job = DataStore.Jobs.FirstOrDefault(j => j.Id == id);
+        var job = await _repo.GetByIdAsync(id);
         if (job == null) return NotFound();
         PopulateDropdowns();
         return View(job);
@@ -27,7 +37,7 @@ public class JobsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, JobPosting updated)
+    public async Task<IActionResult> Edit(int id, JobPosting updated)
     {
         if (id != updated.Id) return BadRequest();
         if (!ModelState.IsValid)
@@ -36,7 +46,7 @@ public class JobsController : Controller
             return View(updated);
         }
 
-        var job = DataStore.Jobs.FirstOrDefault(j => j.Id == id);
+        var job = await _repo.GetByIdAsync(id);
         if (job == null) return NotFound();
 
         // update fields
@@ -50,6 +60,9 @@ public class JobsController : Controller
         job.ClientEvaluation = updated.ClientEvaluation;
         job.ClientContract = updated.ClientContract;
         job.WorkModel = updated.WorkModel;
+        job.RequirementFulfilled = updated.RequirementFulfilled;
+
+        await _repo.UpdateAsync(job);
 
         return RedirectToAction(nameof(Index));
     }
@@ -62,15 +75,14 @@ public class JobsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(JobPosting job)
+    public async Task<IActionResult> Create(JobPosting job)
     {
         if (!ModelState.IsValid)
         {
             PopulateDropdowns();
             return View(job);
         }
-        job.Id = DataStore.Jobs.Any() ? DataStore.Jobs.Max(j => j.Id) + 1 : 1;
-        DataStore.Jobs.Add(job);
+        await _repo.AddAsync(job);
         return RedirectToAction(nameof(Index));
     }
 }

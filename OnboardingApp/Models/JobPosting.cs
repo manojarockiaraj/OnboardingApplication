@@ -34,4 +34,6 @@ public class JobPosting
 
     [Display(Name = "Work Model")]
     public string WorkModel { get; set; } = string.Empty; // e.g. "Hybrid", "Remote"
+
+    public bool RequirementFulfilled { get; set; }
 }

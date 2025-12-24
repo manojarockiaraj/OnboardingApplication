@@ -1,5 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using OnboardingApp.Services;
+using OnboardingApp.Data;
+using Microsoft.EntityFrameworkCore;
+using OnboardingApp.Repositories;
+
+
+AppContext.SetSwitch("System.Net.DisableIPv6", true);
+AppContext.SetSwitch("System.Net.Sockets.DisableDualMode", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +21,21 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new AuthorizeFilter(policy));
 });
 // Register email service
-builder.Services.AddTransient<OnboardingApp.Services.IEmailService, OnboardingApp.Services.SmtpEmailService>();
+builder.Services.AddTransient<IEmailService, SmtpEmailService>();
+
+// Register EF Core with Postgres (Supabase)
+//var conn = builder.Configuration.GetConnectionString("postgresql://postgres:Welcome@12@db.daegresabpkwyjrpkpjo.supabase.co:5432/postgres");
+
+var conn = "Host=db.daegresabpkwyjrpkpjo.supabase.co;Database=postgres;Username=postgres;Password=Welcome@12dec25;SSL Mode=Require;Trust Server Certificate=true";
+if (!string.IsNullOrEmpty(conn))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(conn)
+    );
+}
+
+// Register repositories
+builder.Services.AddScoped<IJobRepository, JobRepository>();
 
 // Add authentication
 builder.Services.AddAuthentication("CookieAuth")
