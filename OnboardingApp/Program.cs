@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Supabase;
+using OnboardingApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,31 @@ builder.Services.AddAuthentication("CookieAuth")
     });
 
 builder.Services.AddAuthorization();
+
+// Configure Supabase client
+var supabaseUrl = builder.Configuration["Supabase:Url"] ?? Environment.GetEnvironmentVariable("SUPABASE_URL");
+var supabaseKey = builder.Configuration["Supabase:Key"] ?? Environment.GetEnvironmentVariable("SUPABASE_KEY");
+
+if (!string.IsNullOrWhiteSpace(supabaseUrl) && !string.IsNullOrWhiteSpace(supabaseKey))
+{
+    var options = new SupabaseOptions
+    {
+        AutoConnectRealtime = true
+    };
+
+    var supabase = new Client(supabaseUrl, supabaseKey, options);
+    // Initialize will perform the initial connection; await on top-level is allowed
+    await supabase.InitializeAsync();
+
+    // Register supabase client and a typed service to fetch data
+    builder.Services.AddSingleton(supabase);
+    builder.Services.AddSingleton<ISupabaseService, SupabaseService>();
+}
+else
+{
+    // If Supabase isn't configured we still register a no-op implementation so controllers won't fail
+    builder.Services.AddSingleton<ISupabaseService, NullSupabaseService>();
+}
 
 var app = builder.Build();
 

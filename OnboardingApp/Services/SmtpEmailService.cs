@@ -1,6 +1,6 @@
 using OnboardingApp.Models;
-using System.Net.Mail;
-using System.Net;
+using global::System.Net.Mail;
+using global::System.Net;
 
 namespace OnboardingApp.Services;
 

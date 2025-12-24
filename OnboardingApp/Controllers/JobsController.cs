@@ -1,20 +1,40 @@
 using Microsoft.AspNetCore.Mvc;
 using OnboardingApp.Models;
 using OnboardingApp.Data;
+using OnboardingApp.Services;
 
 namespace OnboardingApp.Controllers;
 
 public class JobsController : Controller
 {
+    private readonly ISupabaseService _supabaseService;
+
+    public JobsController(ISupabaseService supabaseService)
+    {
+        _supabaseService = supabaseService;
+    }
+
     private void PopulateDropdowns()
     {
         ViewBag.ClientContracts = new List<string> { "Multicapability", "ESFA" };
         ViewBag.WorkModels = new List<string> { "Hybrid", "Remote" };
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View(DataStore.Jobs);
+        List<JobPosting> jobs;
+        try
+        {
+            jobs = await _supabaseService.GetJobPostingsAsync() ?? new List<JobPosting>();
+        }
+        catch (Exception ex)
+        {
+            // Log the exception if you have logging; for now show a friendly error and return an empty list
+            TempData["Error"] = "Unable to load job postings: " + ex.Message;
+            jobs = new List<JobPosting>();
+        }
+
+        return View(jobs);
     }
 
     public IActionResult Edit(int id)

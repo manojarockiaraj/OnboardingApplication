@@ -1,9 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
 
 namespace OnboardingApp.Models;
 
-public class Candidate
+
+public class Candidate : BaseModel
 {
+    [PrimaryKey("id")]
     public int Id { get; set; }
 
     [Required]
