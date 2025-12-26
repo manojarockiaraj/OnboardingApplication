@@ -25,12 +25,20 @@ public class JobRepository : IJobRepository
 
     public async Task AddAsync(JobPosting job)
     {
+        if (job.StartDate.HasValue)
+        {
+            job.StartDate = DateTime.SpecifyKind(job.StartDate.Value, DateTimeKind.Utc);
+        }
         _db.JobPostings.Add(job);
         await _db.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(JobPosting job)
     {
+        if (job.StartDate.HasValue)
+        {
+            job.StartDate = DateTime.SpecifyKind(job.StartDate.Value, DateTimeKind.Utc);
+        }
         _db.JobPostings.Update(job);
         await _db.SaveChangesAsync();
     }
