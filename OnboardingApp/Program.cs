@@ -26,11 +26,38 @@ builder.Services.AddTransient<IEmailService, SmtpEmailService>();
 // Register EF Core with Postgres (Supabase)
 //var conn = builder.Configuration.GetConnectionString("postgresql://postgres:Welcome@12@db.daegresabpkwyjrpkpjo.supabase.co:5432/postgres");
 
-var conn = "Host=db.daegresabpkwyjrpkpjo.supabase.co;Database=postgres;Username=postgres;Password=Welcome@12dec25;SSL Mode=Require;Trust Server Certificate=true";
+//var conn = "Host=db.daegresabpkwyjrpkpjo.supabase.co;Database=postgres;Username=postgres;Port=5432;Password=Welcome@12dec25;SSL Mode=Require;Trust Server Certificate=true";
+var conn = builder.Configuration.GetConnectionString("dbConn");
+
+// var host = "db.daegresabpkwyjrpkpjo.supabase.co";
+// var db = "postgres";
+// var user = "postgres";
+// var password = "Welcome@12dec25";
+// var port = "5432";
+
+//var conn = $"Host={host};Port={port};Database={db};Username={user};Password={password};SSL Mode=Prefer;Trust Server Certificate=True;Timeout=15;Command Timeout=30";
+
 if (!string.IsNullOrEmpty(conn))
 {
+    // Optional: test connection immediately
+    try
+    {
+        using var testConn = new Npgsql.NpgsqlConnection(conn);
+        testConn.Open();
+        Console.WriteLine("Database connection successful!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Database connection failed: " + ex.ToString());
+        throw;
+    }
+
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(conn)
+        options.UseNpgsql(conn, npgsqlOptions =>
+        {
+            npgsqlOptions.EnableRetryOnFailure();
+            //npgsqlOptions.Pooling = false; 
+        })
     );
 }
 
@@ -48,6 +75,11 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.MapGet("/JobPosting", async (AppDbContext db) =>
+{
+    return await db.JobPostings.AsNoTracking().Take(10).ToListAsync();
+});
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -62,11 +94,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+app.UseStaticFiles();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
