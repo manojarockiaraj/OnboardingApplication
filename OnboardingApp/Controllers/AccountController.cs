@@ -19,7 +19,7 @@ public class AccountController : Controller
     };
 
     [AllowAnonymous]
-    public IActionResult Login(string returnUrl = null)
+    public IActionResult Login(string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
         return View();
@@ -28,7 +28,7 @@ public class AccountController : Controller
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(string username, string password, string returnUrl = null)
+    public async Task<IActionResult> Login(string username, string password, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))

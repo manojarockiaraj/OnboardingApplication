@@ -15,7 +15,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<JobPosting>(entity =>
         {
-            entity.ToTable("public.jobposting");
+            entity.ToTable("jobposting");
             entity.HasKey(e => e.Id).HasName("jobposting_pkey");
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Title).HasColumnName("title");
