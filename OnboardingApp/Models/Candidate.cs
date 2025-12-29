@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnboardingApp.Models;
 
@@ -20,26 +21,37 @@ public class Candidate
 
     public string Summary { get; set; } = string.Empty;
 
-    // Interviewer names
+    // Interviewer names (not stored in DB table)
+    [NotMapped]
     [Display(Name = "Cognizant Internal Interviewer Name")]
     public string CTSInternalInterviewerName { get; set; } = string.Empty;
 
+    [NotMapped]
     [Display(Name = "Client Interviewer Name")]
     public string ClientInterviewerName { get; set; } = string.Empty;
 
-    // Status fields
+    // Status fields (not mapped to DB columns in current schema)
+    [NotMapped]
     [Display(Name = "Resume Filter")]
     public StageStatus ResumeFilterStatus { get; set; } = StageStatus.Unknown;
 
+    [NotMapped]
     [Display(Name = "Cognizant Interview")]
     public StageStatus Level1Status { get; set; } = StageStatus.Unknown;
 
+    [NotMapped]
     [Display(Name = "Client Interview")]
     public StageStatus Level2Status { get; set; } = StageStatus.Unknown;
 
+    [NotMapped]
     [Display(Name = "Final Status")]
     public StageStatus FinalStatus { get; set; } = StageStatus.Unknown;
 
+    [NotMapped]
     [Display(Name = "BPSS Status")]
     public StageStatus BpssStatus { get; set; } = StageStatus.Unknown;
+
+    // Optional: map to DB column `availableforinterview` if present
+    [Display(Name = "Available for interview")]
+    public bool? AvailableForInterview { get; set; }
 }
