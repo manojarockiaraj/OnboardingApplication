@@ -64,7 +64,9 @@ if (!string.IsNullOrEmpty(conn))
 // Register repositories
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
+ 
 builder.Services.AddScoped<IOnBoardingRepository, OnBoardingRepository>();
+ 
 
 // Add authentication
 builder.Services.AddAuthentication("CookieAuth")

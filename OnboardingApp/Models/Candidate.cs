@@ -37,7 +37,7 @@ public class Candidate
     [Column("profilesummary")]
     public string? Summary { get; set; }
 
-    // Interviewer names
+
     [NotMapped]
     [Display(Name = "Cognizant Internal Interviewer Name")]
     public string CTSInternalInterviewerName { get; set; } = string.Empty;
@@ -46,7 +46,7 @@ public class Candidate
     [Display(Name = "Client Interviewer Name")]
     public string ClientInterviewerName { get; set; } = string.Empty;
 
-    // Status fields
+
     [NotMapped]
     [Display(Name = "Resume Filter")]
     public StageStatus ResumeFilterStatus { get; set; } = StageStatus.Unknown;
@@ -66,4 +66,6 @@ public class Candidate
     [NotMapped]
     [Display(Name = "BPSS Status")]
     public StageStatus BpssStatus { get; set; } = StageStatus.Unknown;
+
+   
 }

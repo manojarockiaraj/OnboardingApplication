@@ -18,6 +18,12 @@ public class CandidatesController : Controller
     {
         _emailService = emailService;
         _db = db;
+    }
+     
+    public CandidatesController(IEmailService emailService, ICandidateRepository candidateRepository, IJobRepository jobRepository)
+    {
+        _emailService = emailService;
+
         _candidateRepository = candidateRepository;
         _jobRepository = jobRepository;
     }
@@ -33,7 +39,6 @@ public class CandidatesController : Controller
             if (job != null)
             {
                 ViewData["JobTitle"] = job.Title;
-                // match candidates by overlapping skills (simple comma-separated match)
                 var jobSkills = job.Skills.Split(',').Select(s => s.Trim().ToLower()).Where(s => s.Length > 0).ToList();
                 candidates = candidates.Where(c =>
                     c.Skills.Split(',').Select(s => s.Trim().ToLower()).Any(s => jobSkills.Contains(s))
@@ -44,7 +49,7 @@ public class CandidatesController : Controller
         return View(candidates);
     }
 
-    public async Task<IActionResult> Overview()
+     public async Task<IActionResult> Overview()
     {
         // Join candidate and candidatestatus (left join)
         //    var items = await _db.Candidates
@@ -62,8 +67,10 @@ public class CandidatesController : Controller
         return View(items);
     }
 
+    
     public async Task<IActionResult> Details(int id, int? jobId)
     {
+ 
         var candidate = await _candidateRepository.GetByIdAsync(id);
         if (candidate == null) return NotFound();
 
@@ -131,7 +138,7 @@ public class CandidatesController : Controller
         candidateFromDb.Phone = updated.Phone;
         candidateFromDb.Location = updated.Location;
         candidateFromDb.Summary = updated.Summary;
-        candidateFromDb.AvailableForInterview = updated.AvailableForInterview;
+        //candidateFromDb.AvailableForInterview = updated.AvailableForInterview;
 
         await _candidateRepository.UpdateAsync(candidateFromDb);
 
