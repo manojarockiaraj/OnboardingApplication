@@ -64,6 +64,7 @@ public class JobsController : Controller
 
         await _repo.UpdateAsync(job);
 
+        TempData["SuccessMessage"] = "Job updated successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -83,6 +84,7 @@ public class JobsController : Controller
             return View(job);
         }
         await _repo.AddAsync(job);
+        TempData["SuccessMessage"] = "Job created successfully.";
         return RedirectToAction(nameof(Index));
     }
 }

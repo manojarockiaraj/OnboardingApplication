@@ -6,7 +6,8 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">Job Listings</h1>
     <div>
-        <a class="btn btn-primary" asp-action="Create">+ Add Job</a>        
+        <a class="btn btn-primary" asp-action="Create">+ Add Job</a>
+        <a class="btn btn-secondary ms-2" asp-controller="Candidates" asp-action="Index">View Candidates</a>
     </div>
 </div>
 <table class="table table-striped">
@@ -38,7 +39,8 @@
             <td>@job.ClientContract</td>
             <td>@job.WorkModel</td>
             <td>
-                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@job.Id">Edit</a>                
+                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@job.Id">Edit</a>
+                <a class="btn btn-sm btn-info" asp-controller="Candidates" asp-action="Index" asp-route-jobId="@job.Id">Candidates</a>
             </td>
         </tr>
     }

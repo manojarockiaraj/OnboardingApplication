@@ -7,6 +7,10 @@
 
 <h1>Candidates @if(!string.IsNullOrEmpty(jobTitle)){ <text>for "@jobTitle"</text> }</h1>
 
+<div class="mb-3">
+    <a class="btn btn-primary" asp-action="Overview">Candidate Overview</a>
+</div>
+
 @if (jobId == null)
 {
     <p>Showing all candidates. You can filter by job using the Jobs list.</p>

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OnboardingApp.Data;
 using OnboardingApp.Models;
+using OnboardingApp.Repositories;
 using OnboardingApp.Services;
 
 namespace OnboardingApp.Controllers;
@@ -8,20 +10,26 @@ namespace OnboardingApp.Controllers;
 public class CandidatesController : Controller
 {
     private readonly IEmailService _emailService;
+    private readonly AppDbContext _db;
+    private readonly ICandidateRepository _candidateRepository;
+    private readonly IJobRepository _jobRepository;
 
-    public CandidatesController(IEmailService emailService)
+    public CandidatesController(IEmailService emailService, AppDbContext db, ICandidateRepository candidateRepository, IJobRepository jobRepository)
     {
         _emailService = emailService;
+        _db = db;
+        _candidateRepository = candidateRepository;
+        _jobRepository = jobRepository;
     }
 
-    public IActionResult Index(int? jobId)
+    public async Task<IActionResult> Index(int? jobId)
     {
-        var candidates = DataStore.Candidates.AsEnumerable();
+        var candidates = await _candidateRepository.GetAllAsync();
         ViewData["JobId"] = jobId;
 
         if (jobId.HasValue)
         {
-            var job = DataStore.Jobs.FirstOrDefault(j => j.Id == jobId.Value);
+            var job = await _jobRepository.GetByIdAsync(jobId.Value);
             if (job != null)
             {
                 ViewData["JobTitle"] = job.Title;
@@ -29,22 +37,40 @@ public class CandidatesController : Controller
                 var jobSkills = job.Skills.Split(',').Select(s => s.Trim().ToLower()).Where(s => s.Length > 0).ToList();
                 candidates = candidates.Where(c =>
                     c.Skills.Split(',').Select(s => s.Trim().ToLower()).Any(s => jobSkills.Contains(s))
-                );
+                ).ToList();
             }
         }
 
         return View(candidates);
     }
 
-    public IActionResult Details(int id, int? jobId)
+    public async Task<IActionResult> Overview()
     {
-        var candidate = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
+        // Join candidate and candidatestatus (left join)
+        //    var items = await _db.Candidates
+        //.GroupJoin(
+        //    _db.CandidateStatus,
+        //    c => c.Id,
+        //    s => s.ApplicantId,
+        //    (c, statuses) => c
+        //)
+        //.Distinct()
+        //.ToListAsync();
+
+
+        var items = await _db.Candidates.ToListAsync();
+        return View(items);
+    }
+
+    public async Task<IActionResult> Details(int id, int? jobId)
+    {
+        var candidate = await _candidateRepository.GetByIdAsync(id);
         if (candidate == null) return NotFound();
 
         ViewData["JobId"] = jobId;
         if (jobId.HasValue)
         {
-            var job = DataStore.Jobs.FirstOrDefault(j => j.Id == jobId.Value);
+            var job = await _jobRepository.GetByIdAsync(jobId.Value);
             if (job != null)
             {
                 ViewData["JobClientEvaluation"] = job.ClientEvaluation;
@@ -55,15 +81,15 @@ public class CandidatesController : Controller
         return View(candidate);
     }
 
-    public IActionResult EditStatus(int id, int? jobId)
+    public async Task<IActionResult> EditStatus(int id, int? jobId)
     {
-        var candidate = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
+        var candidate = await _candidateRepository.GetByIdAsync(id);
         if (candidate == null) return NotFound();
 
         ViewData["JobId"] = jobId;
         if (jobId.HasValue)
         {
-            var job = DataStore.Jobs.FirstOrDefault(j => j.Id == jobId.Value);
+            var job = await _jobRepository.GetByIdAsync(jobId.Value);
             if (job != null)
             {
                 ViewData["JobClientEvaluation"] = job.ClientEvaluation;
@@ -75,7 +101,7 @@ public class CandidatesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult EditStatus(int id, Candidate updated, int? jobId)
+    public async Task<IActionResult> EditStatus(int id, Candidate updated, int? jobId)
     {
         if (id != updated.Id) return BadRequest();
 
@@ -84,7 +110,7 @@ public class CandidatesController : Controller
             ViewData["JobId"] = jobId;
             if (jobId.HasValue)
             {
-                var job = DataStore.Jobs.FirstOrDefault(j => j.Id == jobId.Value);
+                var job = await _jobRepository.GetByIdAsync(jobId.Value);
                 if (job != null)
                 {
                     ViewData["JobClientEvaluation"] = job.ClientEvaluation;
@@ -93,28 +119,45 @@ public class CandidatesController : Controller
             return View(updated);
         }
 
-        var candidate = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
-        if (candidate == null) return NotFound();
+        // Ensure candidate exists in DB
+        var candidateFromDb = await _candidateRepository.GetByIdAsync(id);
+        if (candidateFromDb == null) return NotFound();
 
-        candidate.Name = updated.Name;
-        candidate.ResumeFilterStatus = updated.ResumeFilterStatus;
-        candidate.Level1Status = updated.Level1Status;
-        candidate.Level2Status = updated.Level2Status;
-        candidate.FinalStatus = updated.FinalStatus;
-        candidate.BpssStatus = updated.BpssStatus;
+        // Update DB-backed candidate where possible
+        candidateFromDb.Name = updated.Name;
+        // only map fields that are persisted in DB table
+        candidateFromDb.Skills = updated.Skills;
+        candidateFromDb.Email = updated.Email;
+        candidateFromDb.Phone = updated.Phone;
+        candidateFromDb.Location = updated.Location;
+        candidateFromDb.Summary = updated.Summary;
+        candidateFromDb.AvailableForInterview = updated.AvailableForInterview;
 
-        // Save interviewer names
-        candidate.CTSInternalInterviewerName = updated.CTSInternalInterviewerName;
-        candidate.ClientInterviewerName = updated.ClientInterviewerName;
+        await _candidateRepository.UpdateAsync(candidateFromDb);
 
-        return RedirectToAction(nameof(Details), new { id = candidate.Id, jobId = jobId });
+        // Also update in-memory DataStore to keep existing app behavior for status fields
+        var candidateInStore = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
+        if (candidateInStore != null)
+        {
+            candidateInStore.Name = updated.Name;
+            candidateInStore.ResumeFilterStatus = updated.ResumeFilterStatus;
+            candidateInStore.Level1Status = updated.Level1Status;
+            candidateInStore.Level2Status = updated.Level2Status;
+            candidateInStore.FinalStatus = updated.FinalStatus;
+            candidateInStore.BpssStatus = updated.BpssStatus;
+
+            candidateInStore.CTSInternalInterviewerName = updated.CTSInternalInterviewerName;
+            candidateInStore.ClientInterviewerName = updated.ClientInterviewerName;
+        }
+
+        return RedirectToAction(nameof(Details), new { id = candidateFromDb.Id, jobId = jobId });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SubmitOnboarding(int id)
     {
-        var candidate = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
+        var candidate = await _candidateRepository.GetByIdAsync(id);
         if (candidate == null) return NotFound();
 
         // Only allow if FinalStatus and BpssStatus are Passed

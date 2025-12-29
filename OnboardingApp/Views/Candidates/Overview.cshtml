@@ -1,0 +1,80 @@
+@model IEnumerable<OnboardingApp.Models.CandidateOverviewViewModel>
+@{
+    ViewData["Title"] = "Candidates Overview";
+}
+
+<h1>Candidate Overview</h1>
+<p>An at-a-glance view of candidates and their current statuses.</p>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Candidate</th>
+            <th>Applied For</th>
+            <th>Status</th>
+            <th style="width:120px; text-align:right">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var item in Model)
+    {
+        var displayStatus = item.FinalStatus ?? item.ClientInterviewStatus ?? item.CtsInternalInterviewStatus ?? item.ResumeStatus ?? "Unknown";
+        <tr>
+            <td>
+                <div><strong>@item.Name</strong></div>
+                <div class="text-muted">@item.Email</div>
+            </td>
+            <td>@item.AppliedFor</td>
+            <td>
+                <span class="badge bg-secondary">@displayStatus</span>
+            </td>
+            <td style="text-align:right">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">&#8942;</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" asp-controller="Candidates" asp-action="Details" asp-route-id="@item.Id">View</a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusModal-@item.Id">View Status</a></li>
+                    </ul>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="statusModal-@item.Id" tabindex="-1" aria-labelledby="statusModalLabel-@item.Id" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="statusModalLabel-@item.Id">Status for @item.Name</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <dl class="row">
+                          <dt class="col-sm-5">Resume</dt>
+                          <dd class="col-sm-7">@item.ResumeStatus</dd>
+
+                          <dt class="col-sm-5">Cognizant Interview</dt>
+                          <dd class="col-sm-7">@item.CtsInternalInterviewStatus @if(!string.IsNullOrEmpty(item.CtsInternalInterviewerName)){ <text>— @item.CtsInternalInterviewerName</text> }</dd>
+
+                          <dt class="col-sm-5">Client Interview</dt>
+                          <dd class="col-sm-7">@item.ClientInterviewStatus @if(!string.IsNullOrEmpty(item.ClientInterviewerName)){ <text>— @item.ClientInterviewerName</text> }</dd>
+
+                          <dt class="col-sm-5">Final</dt>
+                          <dd class="col-sm-7">@item.FinalStatus</dd>
+
+                          <dt class="col-sm-5">Security Check</dt>
+                          <dd class="col-sm-7">@item.SecurityCheckStatus</dd>
+
+                          <dt class="col-sm-5">Onboarding Sent</dt>
+                          <dd class="col-sm-7">@(item.OnboardingRequestSent == true ? "Yes" : "No")</dd>
+                        </dl>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

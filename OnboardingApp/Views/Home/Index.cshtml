@@ -1,8 +1,173 @@
-﻿@{
+﻿@using OnboardingApp.Models
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #f0f3f7 100%);
+        border-bottom: 2px solid #e0e6ed;
+        padding: 1.5rem;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+        
+    .card-header i {
+        font-size: 1.5rem;
+        color: #7f8c8d;
+    }
+
+    .card-content {
+        padding: 1.5rem;
+    }
+
+    .card-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-subtitle {
+        font-size: 0.875rem;
+        color: #95a5a6;
+        font-weight: 500;
+    }
+
+    .metric-card {
+        display: flex;
+        flex-direction: column;
+        border-radius: 8px;
+        border: 1px solid #ecf0f1;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .metric-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        border-color: #d5dce0;
+    }
+
+    .metric-card.positions {
+        border-left: 4px solid #3498db;
+    }
+
+    .metric-card.candidates {
+        border-left: 4px solid #27ae60;
+    }
+
+    .metric-card.applications {
+        border-left: 4px solid #e74c3c;
+    }
+
+    .section-card {
+        border-radius: 8px;
+        border: 1px solid #ecf0f1;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="text-center mb-4">
+    <h1 class="display-4">Welcome @User.Identity.Name</h1>   
+</div>
+
+<div class="space-y-6 px-4">
+    <h1 class="dashboard-title">Dashboard</h1>
+
+    <div class="row g-4 w-100">
+
+        <div class="col-md-4">
+            <div class="metric-card positions">
+                <div class="card-header">
+                    <h3>Open Positions</h3>
+                        <!-- >div style="display:flex; gap:8px; align-items:center;">
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Jobs" asp-action="Index">View</a>
+                            <a class="btn btn-sm btn-primary" asp-controller="Jobs" asp-action="Create">Add</a>
+                        </!--div-->
+                </div>
+                <div class="card-content">
+                    <div class="card-value">@ViewData["OpenPositions"]</div>
+                    <p class="card-subtitle">Total job listings</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="metric-card candidates">
+                <div class="card-header">
+                    <h3>Total Candidates</h3>
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-value">@ViewData["TotalCandidates"]</div>
+                    <p class="card-subtitle">In the talent pool</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="metric-card applications">
+                <div class="card-header">
+                    <h3>Active Applications</h3>
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-value">@ViewData["ActiveApplications"]</div>
+                    <p class="card-subtitle">Currently in the pipeline</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Recent Activity Section
+    <div class="section-card">
+        <div class="card-header">
+            <h3 class="section-title">Recent Activity</h3>
+        </div>
+        <div class="card-content">
+            <p class="text-sm text-muted-foreground mb-0">
+                An overview of recent candidate applications and status changes.
+            </p>
+            <p class="text-muted-foreground mt-3">No recent activity to show.</p>
+        </div>
+    </div>-->
+    <!-- Onboarding Checklist Section -->
+    <div class="section-card">
+        <div class="card-header">
+            <h3 class="section-title">Onboarding Checklist</h3>
+        </div>
+        <div class="card-content">
+            @await Html.PartialAsync("_OnBoardingChecklist", ViewData["OnBoardingItems"] as IEnumerable<OnboardingApp.Models.OnBoardingList>)
+        </div>
+    </div>
 </div>
