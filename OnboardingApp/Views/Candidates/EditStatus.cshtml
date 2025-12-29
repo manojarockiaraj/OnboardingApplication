@@ -10,57 +10,70 @@
     <input type="hidden" asp-for="Id" />
     <input type="hidden" name="jobId" value="@ViewData["JobId"]" />
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="ResumeFilterStatus" class="form-label"></label>
-        <select asp-for="ResumeFilterStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Level1Status" class="form-label"></label>
-        <select asp-for="Level1Status" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
-    </div>
-
-    @* Only show Level2 (Client Interview) when job context either not provided (null) or ClientEvaluation is true *@
-    @if (jobClientEval == null || jobClientEval == true)
-    {
-        <div class="mb-3">
-            <label asp-for="Level2Status" class="form-label"></label>
-            <select asp-for="Level2Status" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-    }
-
-    <div class="mb-3">
-        <label asp-for="FinalStatus" class="form-label"></label>
-        <select asp-for="FinalStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+        <div class="col-md-6 mb-3">
+            <label asp-for="ResumeFilterStatus" class="form-label"></label>
+            <select asp-for="ResumeFilterStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="BpssStatus" class="form-label"></label>
-        <select asp-for="BpssStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Level1Status" class="form-label"></label>
+            <select asp-for="Level1Status" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+        </div>
+        @if (jobClientEval == null || jobClientEval == true)
+        {
+            <div class="col-md-6 mb-3">
+                <label asp-for="Level2Status" class="form-label"></label>
+                <select asp-for="Level2Status" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-6 mb-3"><!-- placeholder for layout --></div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="FinalStatus" class="form-label"></label>
+            <select asp-for="FinalStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="BpssStatus" class="form-label"></label>
+            <select asp-for="BpssStatus" class="form-select" asp-items="Html.GetEnumSelectList<OnboardingApp.Models.StageStatus>()"></select>
+        </div>
     </div>
 
     <h3>Interviewers</h3>
-    <div class="mb-3">
-        <label asp-for="CTSInternalInterviewerName" class="form-label"></label>
-        <input asp-for="CTSInternalInterviewerName" class="form-control" />
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="CTSInternalInterviewerName" class="form-label"></label>
+            <input asp-for="CTSInternalInterviewerName" class="form-control" />
+        </div>
+        @if (jobClientEval == null || jobClientEval == true)
+        {
+            <div class="col-md-6 mb-3">
+                <label asp-for="ClientInterviewerName" class="form-label"></label>
+                <input asp-for="ClientInterviewerName" class="form-control" />
+            </div>
+        }
+        else
+        {
+            <div class="col-md-6 mb-3"><!-- placeholder --></div>
+        }
     </div>
 
-    @if (jobClientEval == null || jobClientEval == true)
-    {
-        <div class="mb-3">
-            <label asp-for="ClientInterviewerName" class="form-label"></label>
-            <input asp-for="ClientInterviewerName" class="form-control" />
-        </div>
-    }
-
-    <button type="submit" class="btn btn-primary">Save Status</button>
-    <a asp-action="Details" asp-route-id="@Model.Id" asp-route-jobId="@ViewData["JobId"]" class="btn btn-secondary">Cancel</a>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save Status</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" asp-route-jobId="@ViewData["JobId"]" class="btn btn-secondary">Cancel</a>
+    </div>
 </form>
 
 @section Scripts {
