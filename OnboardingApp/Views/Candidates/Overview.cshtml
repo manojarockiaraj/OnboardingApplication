@@ -3,78 +3,171 @@
     ViewData["Title"] = "Candidates Overview";
 }
 
+@functions {
+    string GetStatusBadgeClass(object status)
+    {
+        if (status == null)
+            return "bg-secondary";
+
+        var value = status.ToString();
+
+        return value switch
+        {
+            // ---------------- ResumeStatus ----------------
+            "Submitted" => "bg-info",
+            "UnderReview" => "bg-warning text-dark",
+            "Shortlisted" => "bg-primary",
+            "Rejected" => "bg-danger",
+            "OnHold" => "bg-secondary",
+
+            // --------- CTS Internal Interview -------------
+            "NotScheduled" => "bg-secondary",
+            "Scheduled" => "bg-info",
+            "Completed" => "bg-primary",
+            "Selected" => "bg-success",
+            "NoShow" => "bg-dark",
+
+            // ---------------- Client Interview ------------
+            "AwaitingSchedule" => "bg-info",
+            "FeedbackPending" => "bg-warning text-dark",
+
+            // ---------------- Final Status ----------------
+            "InProgress" => "bg-warning text-dark",
+            "Offered" => "bg-primary",
+            "Offer Accepted" => "bg-success",
+            "Offer Rejected" => "bg-danger",
+            "Joined" => "bg-success",
+            "Dropped" => "bg-dark",
+
+            // ---------------- Security Check ---------------
+            "NotInitiated" => "bg-secondary",
+            "Cleared" => "bg-success",
+            "Failed" => "bg-danger",
+
+            // ---------------- Boolean / Flags --------------
+            "True" => "bg-success",
+            "False" => "bg-secondary",
+
+            _ => "bg-light text-dark"
+        };
+    }
+}
+
 <h1>Candidate Overview</h1>
 <p>An at-a-glance view of candidates and their current statuses.</p>
 
 <table class="table table-hover">
     <thead>
         <tr>
-            <th>Candidate</th>
+            <th style="display:none">Candidate ID</th>
+            <th>Name</th>
+            <th>Email</th>
             <th>Applied For</th>
             <th>Status</th>
             <th style="width:120px; text-align:right">Actions</th>
         </tr>
     </thead>
     <tbody>
-    @foreach(var item in Model)
-    {
-        var displayStatus = item.FinalStatus ?? item.ClientInterviewStatus ?? item.CtsInternalInterviewStatus ?? item.ResumeStatus ?? "Unknown";
-        <tr>
-            <td>
-                <div><strong>@item.Name</strong></div>
-                <div class="text-muted">@item.Email</div>
-            </td>
-            <td>@item.AppliedFor</td>
-            <td>
-                <span class="badge bg-secondary">@displayStatus</span>
-            </td>
-            <td style="text-align:right">
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">&#8942;</button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" asp-controller="Candidates" asp-action="Details" asp-route-id="@item.Id">View</a></li>
-                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusModal-@item.Id">View Status</a></li>
-                    </ul>
-                </div>
+        @foreach (var item in Model)
+        {
+            // Compute display status: pick the most advanced non-default status
+            var displayStatus = !string.IsNullOrEmpty(item.FinalStatus) && item.FinalStatus != "NA" ? item.FinalStatus
+                               : !string.IsNullOrEmpty(item.ClientInterviewStatus) && item.ClientInterviewStatus != "NA" ? item.ClientInterviewStatus
+                               : !string.IsNullOrEmpty(item.CtsInternalInterviewStatus) && item.CtsInternalInterviewStatus != "NA" ? item.CtsInternalInterviewStatus
+                               : !string.IsNullOrEmpty(item.ResumeStatus) && item.ResumeStatus != "Submitted" ? item.ResumeStatus
+                               : !string.IsNullOrEmpty(item.SecurityCheckStatus) && item.SecurityCheckStatus != "NA" ? item.SecurityCheckStatus
+                               : "NA";
 
-                <!-- Modal -->
-                <div class="modal fade" id="statusModal-@item.Id" tabindex="-1" aria-labelledby="statusModalLabel-@item.Id" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="statusModalLabel-@item.Id">Status for @item.Name</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <dl class="row">
-                          <dt class="col-sm-5">Resume</dt>
-                          <dd class="col-sm-7">@item.ResumeStatus</dd>
-
-                          <dt class="col-sm-5">Cognizant Interview</dt>
-                          <dd class="col-sm-7">@item.CtsInternalInterviewStatus @if(!string.IsNullOrEmpty(item.CtsInternalInterviewerName)){ <text>— @item.CtsInternalInterviewerName</text> }</dd>
-
-                          <dt class="col-sm-5">Client Interview</dt>
-                          <dd class="col-sm-7">@item.ClientInterviewStatus @if(!string.IsNullOrEmpty(item.ClientInterviewerName)){ <text>— @item.ClientInterviewerName</text> }</dd>
-
-                          <dt class="col-sm-5">Final</dt>
-                          <dd class="col-sm-7">@item.FinalStatus</dd>
-
-                          <dt class="col-sm-5">Security Check</dt>
-                          <dd class="col-sm-7">@item.SecurityCheckStatus</dd>
-
-                          <dt class="col-sm-5">Onboarding Sent</dt>
-                          <dd class="col-sm-7">@(item.OnboardingRequestSent == true ? "Yes" : "No")</dd>
-                        </dl>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      </div>
+            <tr>
+                <td style="display:none">@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Email</td>
+                <td>@item.AppliedFor</td>
+                <td>
+                    @*<span class="badge bg-secondary">@displayStatus</span>*@
+                    <span class="badge @GetStatusBadgeClass(displayStatus)">@displayStatus</span>
+                </td>
+                <td style="text-align:right">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">&#8942;</button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" asp-controller="Candidates" asp-action="Details" asp-route-jobId="@item.JobPostingId" asp-route-id="@item.Id">View</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusModal-@item.Id">View Status</a>
+                            </li>
+                        </ul>
                     </div>
-                  </div>
-                </div>
 
-            </td>
-        </tr>
-    }
+                    <!-- Modal -->
+                    <div class="modal fade" id="statusModal-@item.Id" tabindex="-1" aria-labelledby="statusModalLabel-@item.Id" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content border-primary shadow-sm">
+                                <!-- Header -->
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title" id="statusModalLabel-@item.Id">
+                                        <i class="bi bi-person-badge me-2"></i> Status for @item.Name
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <!-- Body -->
+                                <div class="modal-body">
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-6">
+                                            <strong>Resume Status:</strong>
+                                            <span class="badge @GetStatusBadgeClass(item.ResumeStatus)">@item.ResumeStatus</span>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <strong>CTS Internal Interview:</strong>
+                                            <span class="badge @GetStatusBadgeClass(item.CtsInternalInterviewStatus)">
+                                                @item.CtsInternalInterviewStatus
+                                            </span>
+                                            @if (!string.IsNullOrEmpty(item.CtsInternalInterviewerName))
+                                            {
+                                                <div class="text-muted small">Interviewer: @item.CtsInternalInterviewerName</div>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <strong>Client Interview:</strong>
+                                            <span class="badge @GetStatusBadgeClass(item.ClientInterviewStatus)">
+                                                @item.ClientInterviewStatus
+                                            </span>
+                                            @if (!string.IsNullOrEmpty(item.ClientInterviewerName))
+                                            {
+                                                <div class="text-muted small">Interviewer: @item.ClientInterviewerName</div>
+                                            }
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <strong>Final Status:</strong>
+                                            <span class="badge @GetStatusBadgeClass(item.FinalStatus)">@item.FinalStatus</span>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <strong>Security Check:</strong>
+                                            <span class="badge @GetStatusBadgeClass(item.SecurityCheckStatus)">@item.SecurityCheckStatus</span>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            <strong>Onboarding Request Sent:</strong>
+                                            <span class="badge @(item.OnboardingRequestSent ?? false ? "bg-success" : "bg-secondary")">
+                                                @((item.OnboardingRequestSent ?? false) ? "Yes" : "No")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
+                                        <i class="bi bi-x-circle me-1"></i> Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

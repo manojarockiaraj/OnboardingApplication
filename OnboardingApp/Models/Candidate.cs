@@ -49,23 +49,30 @@ public class Candidate
 
     [NotMapped]
     [Display(Name = "Resume Filter")]
-    public StageStatus ResumeFilterStatus { get; set; } = StageStatus.Unknown;
+    public ResumeStatus ResumeFilterStatus { get; set; } = ResumeStatus.Submitted;
 
     [NotMapped]
     [Display(Name = "Cognizant Interview")]
-    public StageStatus Level1Status { get; set; } = StageStatus.Unknown;
+    public CtsInternalInterviewStatus Level1Status { get; set; } = CtsInternalInterviewStatus.NA;
 
     [NotMapped]
     [Display(Name = "Client Interview")]
-    public StageStatus Level2Status { get; set; } = StageStatus.Unknown;
+    public ClientInterviewStatus Level2Status { get; set; } = ClientInterviewStatus.NA;
 
     [NotMapped]
     [Display(Name = "Final Status")]
-    public StageStatus FinalStatus { get; set; } = StageStatus.Unknown;
+    public FinalStatus FinalStatus { get; set; } = FinalStatus.NA;
 
     [NotMapped]
     [Display(Name = "BPSS Status")]
-    public StageStatus BpssStatus { get; set; } = StageStatus.Unknown;
+    public SecurityCheckStatus BpssStatus { get; set; } = SecurityCheckStatus.NA;
 
-   
+    [NotMapped]
+    public bool IsSelected { get; set; } = false;
+
+    [NotMapped]
+    public JobPosting? JobPostingDetails { get; set; }
+
+    public List<CandidateStatusEvaluation>? CandidateStatusEvaluations { get; set; }
 }
+        

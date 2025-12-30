@@ -37,7 +37,7 @@ public class HomeController : Controller
         ViewData["TotalCandidates"] = totalCandidates;
 
         // Get active applications (candidates with at least one Passed status or Pending status)
-        var activeApplications = await _db.CandidateStatus
+        var activeApplications = await _db.CandidateStatusEvaluation
             //.Where(c => c.ResumeFilterStatus == StageStatus.Pending || c.ResumeFilterStatus == StageStatus.Passed ||
                         //c.Level1Status == StageStatus.Pending || c.Level1Status == StageStatus.Passed ||
                         //c.Level2Status == StageStatus.Pending || c.Level2Status == StageStatus.Passed)

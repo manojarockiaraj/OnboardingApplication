@@ -11,8 +11,8 @@ public class AppDbContext : DbContext
  
     public DbSet<OnBoardingList> OnBoardingLists { get; set; }
     public DbSet<Candidate> Candidates { get; set; }
-    public DbSet<CandidateStatus> CandidateStatus { get; set; }
- 
+    public DbSet<CandidateStatusEvaluation> CandidateStatusEvaluation { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -92,8 +92,8 @@ public class AppDbContext : DbContext
           .HasColumnName("residence")
           .HasMaxLength(150);
 
-    //entity.Property(e => e.AvailableForInterview)
-    //      .HasColumnName("availableforinterview");
+    entity.Property(e => e.AvailableForInterview)
+          .HasColumnName("availableforinterview");
 
     entity.Property(e => e.Summary)
           .HasColumnName("profilesummary");
@@ -106,66 +106,48 @@ public class AppDbContext : DbContext
             //entity.Property(e => e.BpssStatus).HasColumnName("bpssstatus");
         });
 
-        modelBuilder.Entity<CandidateStatus>(entity =>
+        modelBuilder.Entity<CandidateStatusEvaluation>(entity =>
         {
-            entity.ToTable("candidatestatus");
-            entity.HasKey(e => e.ApplicantId).HasName("statusid");
+            entity.ToTable("candidatestatusevaluation");
 
-            entity.Property(e => e.ApplicantId)
-                  .HasColumnName("applicantid");
+            entity.HasKey(e => e.EvaluationId)
+                  .HasName("candidate_evaluation_pkey");
 
-            entity.Property(e => e.JobPostingId)
-                  .HasColumnName("jobpostingid");
+            entity.Property(e => e.EvaluationId).HasColumnName("evaluationid");
+            entity.Property(e => e.CandidateId).HasColumnName("candidateid");
+            entity.Property(e => e.JobPostingId).HasColumnName("jobpostingid");
 
-            entity.Property(e => e.ResumeStatus)
-                  .HasColumnName("resumestatus")
-                  .HasMaxLength(50);
+            entity.Property(e => e.ResumeStatus).HasColumnName("resumestatus").HasConversion<string>();
+            entity.Property(e => e.ResumeReviewedBy).HasColumnName("resumereviewedby").HasMaxLength(100);
+            entity.Property(e => e.ResumeReviewedDate).HasColumnName("resumerevieweddate");
 
-            entity.Property(e => e.CtsInternalInterviewStatus)
-                  .HasColumnName("ctsinternalinterviewstatus")
-                  .HasMaxLength(50);
 
-            entity.Property(e => e.CtsInternalInterviewerName)
-                  .HasColumnName("ctsinternalinterviewername")
-                  .HasMaxLength(150);
 
-            entity.Property(e => e.ClientInterviewStatus)
-                  .HasColumnName("clientinterviewstatus")
-                  .HasMaxLength(50);
+            entity.Property(e => e.CtsInternalInterviewStatus).HasColumnName("ctsinternalinterviewstatus").HasConversion<string>();
+            entity.Property(e => e.CtsInternalInterviewerName).HasColumnName("ctsinternalinterviewername").HasMaxLength(100);
+            entity.Property(e => e.CtsInternalInterviewDate).HasColumnName("ctsinternalinterviewdate");
+            entity.Property(e => e.CtsInternalFeedback).HasColumnName("ctsinternalfeedback").HasMaxLength(500);
 
-            entity.Property(e => e.ClientInterviewerName)
-                  .HasColumnName("clientinterviewername")
-                  .HasMaxLength(150);
+            entity.Property(e => e.ClientInterviewStatus).HasColumnName("clientinterviewstatus").HasConversion<string>();
+            entity.Property(e => e.ClientInterviewerName).HasColumnName("clientinterviewername").HasMaxLength(100);
+            entity.Property(e => e.ClientInterviewDate).HasColumnName("clientinterviewdate");
+            entity.Property(e => e.ClientFeedback).HasColumnName("clientfeedback").HasMaxLength(500);
 
-            entity.Property(e => e.FinalStatus)
-                  .HasColumnName("finalstatus")
-                  .HasMaxLength(50);
+            entity.Property(e => e.FinalStatus).HasColumnName("finalstatus").HasConversion<string>();
+            entity.Property(e => e.FinalDecisionDate).HasColumnName("finaldecisiondate");
 
-            entity.Property(e => e.SecurityCheckStatus)
-                  .HasColumnName("securitycheckstatus")
-                  .HasMaxLength(50);
+            entity.Property(e => e.SecurityCheckStatus).HasColumnName("securitycheckstatus").HasConversion<string>();
+            entity.Property(e => e.SecurityCheckCompletedDate).HasColumnName("securitycheckcompleteddate");
 
-            entity.Property(e => e.OnboardingRequestSent)
-                  .HasColumnName("onboardingrequestsent");
+            entity.Property(e => e.OnboardingRequestSent).HasColumnName("onboardingrequestsent").HasDefaultValue(false);
+            entity.Property(e => e.OnboardingRequestDate).HasColumnName("onboardingrequestdate");
 
+            entity.Property(e => e.CreatedDate).HasColumnName("createddate").HasDefaultValueSql("now()");
+            entity.Property(e => e.UpdatedDate).HasColumnName("updateddate");
         });
 
 
- 
-        modelBuilder.Entity<Candidate>(entity =>
-        {
-            entity.ToTable("candidate");
-            entity.HasKey(e => e.Id).HasName("candidates_papplicantidkey");
-            entity.Property(e => e.Id).HasColumnName("applicantid");
-            entity.Property(e => e.Name).HasColumnName("fullname");
-            entity.Property(e => e.Skills).HasColumnName("skillset");
-            entity.Property(e => e.Email).HasColumnName("contactemail");
-            entity.Property(e => e.Phone).HasColumnName("contactphone");
-            entity.Property(e => e.Location).HasColumnName("residence");
-            //entity.Property(e => e.AvailableForInterview).HasColumnName("availableforinterview");
-            entity.Property(e => e.Summary).HasColumnName("profilesummary");
-            // other properties map to default column names (if present)
-        });
+
 
     }
 }

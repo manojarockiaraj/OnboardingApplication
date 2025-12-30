@@ -1,87 +1,252 @@
 @model OnboardingApp.Models.Candidate
+
 @{
     ViewData["Title"] = "Candidate Details";
+
     var jobClientEvalObj = ViewData["JobClientEvaluation"];
-    // Show client interview only when job context explicitly indicates ClientEvaluation == true
     bool showClientInterview = jobClientEvalObj is bool b && b;
+
+    var evaluation = Model.CandidateStatusEvaluations?.FirstOrDefault();
 }
 
-<h1>@Model.Name</h1>
-<div class="mb-3">
-    <strong>Skills:</strong> @Model.Skills
-</div>
-<div class="mb-3">
-    <strong>Email:</strong> @Model.Email
-</div>
-<div class="mb-3">
-    <strong>Phone:</strong> @Model.Phone
-</div>
-<div class="mb-3">
-    <strong>Location:</strong> @Model.Location
-</div>
-<div class="mb-3">
-    <strong>Summary:</strong>
-    <p>@Model.Summary</p>
+@functions {
+    string GetStatusBadgeClass(object status)
+    {
+        if (status == null)
+            return "bg-secondary";
+
+        var value = status.ToString();
+
+        return value switch
+        {
+            // ---------------- ResumeStatus ----------------
+            "Submitted" => "bg-info",
+            "Under Review" => "bg-warning text-dark",
+            "Shortlisted" => "bg-primary",
+            "Rejected" => "bg-danger",
+            "OnHold" => "bg-secondary",
+
+            // --------- CTS Internal Interview -------------
+            "Not Scheduled" => "bg-secondary",
+            "Scheduled" => "bg-info",
+            "Completed" => "bg-primary",
+            "Selected" => "bg-success",
+            "No Show" => "bg-dark",
+
+            // ---------------- Client Interview ------------
+            "Awaiting Schedule" => "bg-info",
+            "Feedback Pending" => "bg-warning text-dark",
+
+            // ---------------- Final Status ----------------
+            "In Progress" => "bg-warning text-dark",
+            "Offered" => "bg-primary",
+            "Offer Accepted" => "bg-success",
+            "Offer Rejected" => "bg-danger",
+            "Joined" => "bg-success",
+            "Dropped" => "bg-dark",
+
+            // ---------------- Security Check ---------------
+            "Not Initiated" => "bg-secondary",
+            "Cleared" => "bg-success",
+            "Failed" => "bg-danger",
+
+            // ---------------- Boolean / Flags --------------
+            "True" => "bg-success",
+            "False" => "bg-secondary",
+
+            _ => "bg-light text-dark"
+        };
+    }
+}
+
+
+
+<h1 class="mb-4">Candidate | Progress</h1>
+
+<!-- Candidate Basic Info - 4 Column Layout -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">@Model.Name</h4>
+            <span class="badge bg-primary">Candidate Profile</span>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <label class="form-label text-muted">Skills</label>
+                <div class="form-control bg-light">
+                    @Model.Skills
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label text-muted">Email</label>
+                <div class="form-control bg-light">
+                    @Model.Email
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label text-muted">Phone</label>
+                <div class="form-control bg-light">
+                    @Model.Phone
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label text-muted">Location</label>
+                <div class="form-control bg-light">
+                    @Model.Location
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label text-muted">Summary</label>
+                <div class="form-control bg-light" style="min-height: 90px">
+                    @Model.Summary
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
-<h3>Interviewers</h3>
-<table class="table">
-    <tbody>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.CTSInternalInterviewerName)</th>
-            <td>@Model.CTSInternalInterviewerName</td>
-        </tr>
+
+@if (evaluation == null)
+{
+    <div class="alert alert-warning">
+        No evaluation record found for this candidate and job.
+    </div>
+}
+else
+{
+    <!-- Interviewers - Column Layout -->
+    <h3 class="mt-4">Interviewers</h3>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">CTS Internal Interviewer</h6>
+                    <strong>@evaluation.CtsInternalInterviewerName</strong>
+                </div>
+            </div>
+        </div>
+
         @if (showClientInterview)
         {
-            <tr>
-                <th>@Html.DisplayNameFor(m => m.ClientInterviewerName)</th>
-                <td>@Model.ClientInterviewerName</td>
-            </tr>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6 class="text-muted">Client Interviewer</h6>
+                        <strong>@evaluation.ClientInterviewerName</strong>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+    </div>
 
-<h3>Statuses</h3>
-<table class="table">
-    <tbody>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.ResumeFilterStatus)</th>
-            <td>@Model.ResumeFilterStatus</td>
-        </tr>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.Level1Status)</th>
-            <td>@Model.Level1Status</td>
-        </tr>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <!-- Statuses - Column Based Table -->
+    <h3 class="mt-4">Status</h3>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Resume</h6>
+                    <span class="badge @GetStatusBadgeClass(evaluation.ResumeStatus.ToString())">
+                        @evaluation.ResumeStatus
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">CTS Internal Interview</h6>
+                    <span class="badge @GetStatusBadgeClass(evaluation.CtsInternalInterviewStatus.ToString())">
+                        @evaluation.CtsInternalInterviewStatus
+                    </span>
+                </div>
+            </div>
+        </div>
+
         @if (showClientInterview)
         {
-            <tr>
-                <th>@Html.DisplayNameFor(m => m.Level2Status)</th>
-                <td>@Model.Level2Status</td>
-            </tr>
+            <div class="col-md-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Client Interview</h6>
+                        <span class="badge @GetStatusBadgeClass(evaluation.ClientInterviewStatus.ToString())">
+                            @evaluation.ClientInterviewStatus
+                        </span>
+                    </div>
+                </div>
+            </div>
         }
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.FinalStatus)</th>
-            <td>@Model.FinalStatus</td>
-        </tr>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.BpssStatus)</th>
-            <td>@Model.BpssStatus</td>
-        </tr>
-    </tbody>
-</table>
 
-<form asp-action="SubmitOnboarding" method="post">
-    <input type="hidden" name="id" value="@Model.Id" />
-    <button type="submit" class="btn btn-success" @(Model.FinalStatus == OnboardingApp.Models.StageStatus.Passed && Model.BpssStatus == OnboardingApp.Models.StageStatus.Passed ? "" : "disabled")>Submit Onboarding Request</button>
-    <a class="btn btn-primary" asp-action="EditStatus" asp-route-id="@Model.Id" asp-route-jobId="@ViewData["JobId"]">Edit Status</a>
-    <a class="btn btn-secondary" asp-action="Index">Back</a>
-</form>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Final Status</h6>
+                    <span class="badge @GetStatusBadgeClass(evaluation.FinalStatus.ToString())">
+                        @evaluation.FinalStatus
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">BPSS Status</h6>
+                    <span class="badge @GetStatusBadgeClass(evaluation.SecurityCheckStatus.ToString())">
+                        @evaluation.SecurityCheckStatus
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Actions -->
+    <form asp-action="SubmitOnboarding" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+
+        <button type="submit"
+                class="btn btn-success me-2"
+                @(evaluation.FinalStatus == OnboardingApp.Models.FinalStatus.InProgress && evaluation.SecurityCheckStatus == OnboardingApp.Models.SecurityCheckStatus.Cleared ? "" : "disabled")>
+            Submit Onboarding Request
+        </button>
+
+        <a class="btn btn-primary me-2"
+           asp-action="EditStatus"
+           asp-route-id="@Model.Id"
+           asp-route-jobId="@ViewData["JobId"]">
+            Edit Status
+        </a>
+
+        <a class="btn btn-secondary"
+           asp-action="Index"
+           asp-route-jobId="@ViewData["JobId"]">
+            Back
+        </a>
+    </form>
+}

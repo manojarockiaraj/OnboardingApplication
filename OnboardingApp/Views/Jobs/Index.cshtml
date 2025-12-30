@@ -15,11 +15,11 @@
             <th>Title</th>
             <th>Skills</th>
             <th>Client</th>
-            <th>Contact</th>
+            @*<th>Contact</th>*@
             <th>Location</th>
             <th>Start Date</th>
             <th>Client Evaluation</th>
-            <th>Client Contract</th>
+            @*<th>Client Contract</th>*@
             <th>Work Model</th>
             <th></th>
         </tr>
@@ -31,14 +31,18 @@
             <td>@job.Title</td>
             <td>@job.Skills</td>
             <td>@job.ClientName</td>
-            <td>@job.ClientContact</td>
+            @*<td>@job.ClientContact</td>*@
             <td>@job.Location</td>
             <td>@(job.StartDate?.ToString("yyyy-MM-dd") ?? "")</td>
             <td>@(job.ClientEvaluation ? "Yes" : "No")</td>
-            <td>@job.ClientContract</td>
+            @*<td>@job.ClientContract</td>*@
             <td>@job.WorkModel</td>
             <td>
-                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@job.Id">Edit</a>                
+                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@job.Id">Edit</a>
+                
+            </td>
+            <td>
+                <a class="btn btn-sm btn-info" asp-controller="Candidates" asp-action="Index" asp-route-jobId="@job.Id">Candidates</a>
             </td>
         </tr>
     }

@@ -12,9 +12,9 @@ public static class DataStore
 
     public static readonly List<Candidate> Candidates = new List<Candidate>
     {
-        new Candidate { Id = 1, Name = "Alice Johnson", Skills = "C#, SQL, Azure", Email = "alice@example.com", Phone = "555-0100", Location = "London", Summary = "Experienced backend engineer", ResumeFilterStatus = StageStatus.Passed , BpssStatus = StageStatus.Passed, FinalStatus = StageStatus.Passed,
-        Level1Status = StageStatus.Passed, Level2Status = StageStatus.Passed},
-        new Candidate { Id = 2, Name = "Bob Smith", Skills = "JavaScript, React, CSS", Email = "bob@example.com", Phone = "555-0123", Location = "Coventry", Summary = "Frontend specialist", ResumeFilterStatus = StageStatus.Passed, Level1Status = StageStatus.Pending },
+        new Candidate { Id = 1, Name = "Alice Johnson", Skills = "C#, SQL, Azure", Email = "alice@example.com", Phone = "555-0100", Location = "London", Summary = "Experienced backend engineer", ResumeFilterStatus = ResumeStatus.Submitted , BpssStatus = SecurityCheckStatus.NotInitiated, FinalStatus = FinalStatus.InProgress,
+        Level1Status = CtsInternalInterviewStatus.NotScheduled, Level2Status = ClientInterviewStatus.AwaitingSchedule},
+        new Candidate { Id = 2, Name = "Bob Smith", Skills = "JavaScript, React, CSS", Email = "bob@example.com", Phone = "555-0123", Location = "Coventry", Summary = "Frontend specialist", ResumeFilterStatus = ResumeStatus.Submitted, Level1Status = CtsInternalInterviewStatus.NotScheduled },
         new Candidate { Id = 3, Name = "Carol Lee", Skills = "C#, ASP.NET Core, JavaScript", Email = "carol@example.com", Phone = "555-0155", Location = "Coventry", Summary = "Full-stack developer" }
     };
 
