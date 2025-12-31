@@ -18,7 +18,7 @@ public class JobsController : Controller
     private void PopulateDropdowns()
     {
         ViewBag.ClientContracts = new List<string> { "Multicapability", "ESFA" };
-        ViewBag.WorkModels = new List<string> { "Hybrid", "Remote" };
+        ViewBag.WorkModels = new List<string> { "Hybrid", "Remote" , "Onsite" };
     }
 
     public async Task<IActionResult> Index()

@@ -1,0 +1,134 @@
+﻿@model OnboardingApp.Models.Candidate
+
+@{
+    ViewData["Title"] = "Candidate Mapping";
+
+    var jobClientEvalObj = ViewData["JobClientEvaluation"];
+    bool showClientInterview = jobClientEvalObj is bool b && b;
+
+    var evaluation = Model.CandidateStatusEvaluations?.FirstOrDefault();
+}
+
+
+
+
+
+@if (Model.JobPostingDetails != null)
+{
+    @await Html.PartialAsync("_JobProfile", Model.JobPostingDetails)
+}
+else
+{
+    <p> No partial view binded </p>
+}
+
+@*<h1 class="mb-4">Candidate Profile</h1>*@
+
+<!-- Candidate Info Card - 2 Column Layout -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+        <span class="me-2 fw-bold" style="font-size: 1rem;">Candidate Profile:</span>
+        <h5 class="mb-0 fw-bold" style="font-size: 1rem;">@Model.Name</h5>
+    </div>
+
+    <div class="card-body">
+        <div class="row g-3 align-items-center">
+
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="bi bi-person-badge me-2 text-primary" style="font-size: 1.2rem;"></i>
+                <div class="d-flex">
+                    <div class="text-muted me-2" style="min-width: 120px; font-size: 1rem;">Employee Id:</div>
+                    <div class="fw-bold" style="font-size: 1rem;">@Model.EmployeeId</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="bi bi-envelope me-2 text-primary" style="font-size: 1.2rem;"></i>
+                <div class="d-flex">
+                    <div class="text-muted me-2" style="min-width: 120px; font-size: 1rem;">Email:</div>
+                    <div class="fw-bold" style="font-size: 1rem;">@Model.Email</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="bi bi-briefcase me-2 text-primary" style="font-size: 1.2rem;"></i>
+                <div class="d-flex">
+                    <div class="text-muted me-2" style="min-width: 120px; font-size: 1rem;">Skills:</div>
+                    <div class="fw-bold" style="font-size: 1rem;">@Model.Skills</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="bi bi-telephone me-2 text-primary" style="font-size: 1.2rem;"></i>
+                <div class="d-flex">
+                    <div class="text-muted me-2" style="min-width: 120px; font-size: 1rem;">Phone:</div>
+                    <div class="fw-bold" style="font-size: 1rem;">@Model.Phone</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="bi bi-geo-alt me-2 text-primary" style="font-size: 1.2rem;"></i>
+                <div class="d-flex">
+                    <div class="text-muted me-2" style="min-width: 120px; font-size: 1rem;">Location:</div>
+                    <div class="fw-bold" style="font-size: 1rem;">@Model.Location</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-center">
+                <div class="text-muted me-2" style="min-width: 120px; font-size: 1rem;">Available for Interview:</div>
+                <div>
+                    @if (Model.AvailableForInterview.HasValue && Model.AvailableForInterview.Value)
+                    {
+                        <span class="badge bg-success">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">No</span>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-center">
+                <i class="bi bi-geo-alt me-2 text-primary" style="font-size: 1.2rem;"></i>
+                <div class="d-flex">
+                    <div cclass="text-muted me-2" style="min-width: 120px; font-size: 1rem;">Summary:</div>
+                    <div class="fw-bold" style="font-size: 1rem;">@Model.Summary</div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@if (evaluation == null)
+{
+    <div class="alert alert-warning">No evaluation record found for this candidate and job.</div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2">
+        <form asp-action="AllocateCandidate" method="post" class="me-2">
+            <input type="hidden" name="candidateId" value="@Model.Id" />
+            <input type="hidden" name="jobPostingId" value="@ViewData["JobId"]" />
+            <button type="submit" class="btn btn-success">Allocate</button>
+        </form>
+
+        <a class="btn btn-secondary" asp-action="AssignCandidates" asp-route-jobId="@ViewData["JobId"]">Back</a>
+    </div>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        Evaluation Process Already Initiated.
+    </div>
+
+    <a class="btn btn-secondary" asp-action="AssignCandidates" asp-route-jobId="@ViewData["JobId"]">Back</a>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+}

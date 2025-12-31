@@ -27,21 +27,27 @@ public class CandidatesController : Controller
         var candidates = await _candidateRepository.GetAllAsync();
         ViewData["JobId"] = jobId;
 
-        if (jobId.HasValue)
-        {
-            var job = await _jobRepository.GetByIdAsync(jobId.Value);
-            if (job != null)
-            {
-                ViewData["JobTitle"] = job.Title;
-                var jobSkills = job.Skills.Split(',').Select(s => s.Trim().ToLower()).Where(s => s.Length > 0).ToList();
-                candidates = candidates.Where(c =>
-                    c.Skills.Split(',').Select(s => s.Trim().ToLower()).Any(s => jobSkills.Contains(s))
-                ).ToList();
+        //if (jobId.HasValue)
+        //{
+        //    var job = await _jobRepository.GetByIdAsync(jobId.Value);
+        //    if (job != null)
+        //    {
+        //        ViewData["JobTitle"] = string.Concat(job.Title," ", job.Skills);
+        //        var jobSkills = job.Skills.Split(',').Select(s => s.Trim().ToLower()).Where(s => s.Length > 0).ToList();
+        //        candidates = candidates.Where(c =>
+        //            c.Skills.Split(',').Select(s => s.Trim().ToLower()).Any(s => jobSkills.Contains(s))
+        //        ).ToList();
 
-                if(candidates.Any())
-                    candidates[0].JobPostingDetails = job;
-            }
+        //        if(candidates.Any())
+        //            candidates[0].JobPostingDetails = job;
+        //    }
+        //}
+
+        foreach(var c in candidates)
+        {
+           // candidates.CandidateStatusEvaluations = _candidateRepository.GetCandidateEvaluation(c.Id, c.JobPostingDetails.Id);
         }
+           
 
         //var candidates = await _candidateRepository.GetAllAsync();
         //ViewData["JobId"] = jobId;
@@ -79,6 +85,95 @@ public class CandidatesController : Controller
         return View(candidates);
     }
 
+    public async Task<IActionResult> AssignCandidates(int jobId)
+    {
+        var candidates = await _candidateRepository.GetAllAsync();
+        ViewData["JobId"] = jobId;
+
+        if (jobId!=0)
+        {
+            var job = await _jobRepository.GetByIdAsync(jobId);
+            if (job != null)
+            {
+                ViewData["JobTitle"] = string.Concat(job.Title, " ", job.Skills);
+                var jobSkills = job.Skills.Split(',').Select(s => s.Trim().ToLower()).Where(s => s.Length > 0).ToList();
+                candidates = candidates.Where(c =>
+                    c.Skills.Split(',').Select(s => s.Trim().ToLower()).Any(s => jobSkills.Contains(s))
+                ).ToList();
+
+                if (candidates.Any())
+                    candidates[0].JobPostingDetails = job;
+            }
+        }
+
+        foreach (var c in candidates)
+        {
+            // candidates.CandidateStatusEvaluations = _candidateRepository.GetCandidateEvaluation(c.Id, c.JobPostingDetails.Id);
+        }
+
+
+        //var candidates = await _candidateRepository.GetAllAsync();
+        //ViewData["JobId"] = jobId;
+
+        //if (jobId.HasValue)
+        //{
+        //    var job = await _jobRepository.GetByIdAsync(jobId.Value);
+        //    if (job != null)
+        //    {
+        //        ViewData["JobTitle"] = job.Title;
+
+        //        // Prepare job skills for comparison
+        //        var jobSkills = job.Skills
+        //            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+        //            .Select(s => s.Trim().ToLower())
+        //            .ToList();
+
+        //        // Filter candidates based on matching skills
+        //        candidates = candidates
+        //            .Where(c => c.Skills
+        //                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+        //                .Select(s => s.Trim().ToLower())
+        //                .Any(s => jobSkills.Contains(s)))
+        //            .ToList();
+
+        //        // Update each candidate with their evaluation for this job
+        //        foreach (var candidate in candidates)
+        //        {
+        //            candidate.CandidateStatusEvaluations = await _candidateRepository.GetCandidateEvaluation(candidate.Id, jobId.Value);
+        //        }
+        //    }
+        //}
+
+
+        return View(candidates);
+    }
+
+    public async Task<IActionResult> MapEmployeeToJob(int id, int? jobId)
+    {
+
+        var candidate = await _candidateRepository.GetByIdAsync(id);
+        if (candidate == null) return NotFound();
+
+        ViewData["JobId"] = jobId;
+        if (jobId.HasValue)
+        {
+            var job = await _jobRepository.GetByIdAsync(jobId.Value);
+            if (job != null)
+            {
+                ViewData["JobClientEvaluation"] = job.ClientEvaluation;
+                ViewData["JobTitle"] = job.Title;
+
+                candidate.JobPostingDetails = job;
+            }
+        }
+
+        if (jobId.HasValue)
+            candidate.CandidateStatusEvaluations = await _candidateRepository.GetCandidateEvaluation(id, jobId.Value);
+
+        return View(candidate);
+    }
+
+
     public async Task<IActionResult> Overview()
     {
         // Get candidates with their latest evaluation
@@ -102,10 +197,12 @@ public class CandidatesController : Controller
         var model = items.Select(x => new CandidateOverviewViewModel
         {
             Id = x.Candidate.Id,
+            StatusId = x.Evaluation.EvaluationId,
             JobPostingId = x.Evaluation.JobPostingId,
             Name = x.Candidate.Name,
             Email = x.Candidate.Email,
             AppliedFor = x.JobPosting.Skills, // or JobTitle, whichever you prefer
+            
 
             // Status fields
             ResumeStatus = x.Evaluation?.ResumeStatus.ToString() ?? "Submitted",
@@ -116,56 +213,7 @@ public class CandidatesController : Controller
             FinalStatus = x.Evaluation?.FinalStatus.ToString() ?? "NA",
             SecurityCheckStatus = x.Evaluation?.SecurityCheckStatus.ToString() ?? "NA",
             OnboardingRequestSent = x.Evaluation?.OnboardingRequestSent ?? false
-        }).ToList();
-
-        return View(model);
-    }
-
-
-    public async Task<IActionResult> Overview1()
-    {
-        // Get candidates with their latest evaluation
-        var items = await (
-            from c in _db.Candidates
-            join e in _db.CandidateStatusEvaluation
-                on c.Id equals e.CandidateId into evals
-            from latestEval in evals
-                .OrderByDescending(x => x.UpdatedDate ?? x.CreatedDate)
-                .Take(1)
-                .DefaultIfEmpty()
-            select new
-            {
-                Candidate = c,
-                Evaluation = latestEval
-            }
-        ).ToListAsync();
-
-        // Map to full model for the view
-        var model = items.Select(x => new CandidateStatusEvaluation
-        {
-            EvaluationId = x.Evaluation?.EvaluationId ?? 0,
-            CandidateId = x.Candidate.Id,
-            JobPostingId = x.Evaluation?.JobPostingId ?? 0,
-            ResumeStatus = x.Evaluation.ResumeStatus,
-            ResumeReviewedBy = x.Evaluation?.ResumeReviewedBy,
-            ResumeReviewedDate = x.Evaluation?.ResumeReviewedDate,
-            CtsInternalInterviewStatus = x.Evaluation.CtsInternalInterviewStatus,
-            CtsInternalInterviewerName = x.Evaluation?.CtsInternalInterviewerName,
-            CtsInternalInterviewDate = x.Evaluation?.CtsInternalInterviewDate,
-            CtsInternalFeedback = x.Evaluation?.CtsInternalFeedback,
-            ClientInterviewStatus = x.Evaluation.ClientInterviewStatus,
-            ClientInterviewerName = x.Evaluation?.ClientInterviewerName,
-            ClientInterviewDate = x.Evaluation?.ClientInterviewDate,
-            ClientFeedback = x.Evaluation?.ClientFeedback,
-            FinalStatus = x.Evaluation.FinalStatus,
-            FinalDecisionDate = x.Evaluation?.FinalDecisionDate,
-            SecurityCheckStatus = x.Evaluation.SecurityCheckStatus,
-            SecurityCheckCompletedDate = x.Evaluation?.SecurityCheckCompletedDate,
-            OnboardingRequestSent = x.Evaluation?.OnboardingRequestSent ?? false,
-            OnboardingRequestDate = x.Evaluation?.OnboardingRequestDate,
-            CreatedDate = x.Evaluation?.CreatedDate,
-            UpdatedDate = x.Evaluation?.UpdatedDate
-        }).ToList();
+        }).ToList().OrderBy(a=>a.Email);
 
         return View(model);
     }
@@ -289,6 +337,8 @@ public class CandidatesController : Controller
     [HttpPost]
     public async Task<IActionResult> UpdateResumeStatus(int JobPostingId, List<Candidate> Candidates)
     {
+        List<string> _error = new List<string>();
+
         // Get selected candidates
         var selectedCandidates = Candidates
             .Where(c => c.IsSelected)   
@@ -323,9 +373,76 @@ public class CandidatesController : Controller
         return RedirectToAction("Index", new { jobId = JobPostingId });
     }
 
+    public async Task<IActionResult> AllocateCandidate(int jobPostingId, int candidateId)
+    {
+        var candidateFromDb = await _candidateRepository.GetByIdAsync(candidateId);
 
+        if (candidateFromDb == null)
+            return RedirectToAction("Index", new { jobId = jobPostingId });
+
+        var evaluation = new CandidateStatusEvaluation
+        {
+            CandidateId = candidateFromDb.Id,
+            JobPostingId = jobPostingId,
+            ResumeStatus = ResumeStatus.UnderReview, // or from your logic
+            UpdatedDate = DateTime.UtcNow
+        };
+
+        // Repository handles Add or Update
+        await _candidateRepository.AddOrUpdateCandidateStatusAsync(evaluation);
+
+       
+
+        TempData["Success"] = "Allocation status updated successfully.";
+        ViewData["JobId"] = jobPostingId; // pass extra info via ViewData
+        return View("MapEmployeeToJob", candidateFromDb);
+
+    }
+
+    public IActionResult Create()
+    {
+        return View();
+    }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(Candidate candidate)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(candidate);
+        }
+
+        await _candidateRepository.AddAsync(candidate);
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        var candidate = await _candidateRepository.GetByIdAsync(id);
+        if (candidate == null)
+            return NotFound();
+
+        return View(candidate);
+    }
+
+    // POST: Candidates/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Candidate candidate)
+    {
+        if (id != candidate.Id)
+            return BadRequest();
+
+        if (!ModelState.IsValid)
+            return View(candidate);
+
+        await _candidateRepository.UpdateAsync(candidate);
+        return RedirectToAction(nameof(Index));
+    }
+
+
+[HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SubmitOnboarding(int id)
     {

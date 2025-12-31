@@ -20,6 +20,12 @@ builder.Services.AddControllersWithViews(options =>
         .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
 });
+
+builder.Services
+    .AddControllersWithViews()
+    .AddDataAnnotationsLocalization();
+
+
 // Register email service
 builder.Services.AddTransient<IEmailService, SmtpEmailService>();
 

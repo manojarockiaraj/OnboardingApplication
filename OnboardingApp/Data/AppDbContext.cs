@@ -60,8 +60,8 @@ public class AppDbContext : DbContext
         //    entity.Property(e => e.Location).HasColumnName("residence");
         //    entity.Property(e => e.AvailableForInterview).HasColumnName("availableforinterview");
         //    entity.Property(e => e.Summary).HasColumnName("profilesummary");
-        //    // other properties map to default column names (if present)
-        //});
+        //    // other properties map to default column names (if present)  
+        //}); 
 
         modelBuilder.Entity<Candidate>(entity =>
         {
@@ -72,7 +72,10 @@ public class AppDbContext : DbContext
     entity.Property(e => e.Id)
           .HasColumnName("candidateid");
 
-    entity.Property(e => e.Name)
+            entity.Property(e => e.EmployeeId)
+        .HasColumnName("employeeid");
+
+            entity.Property(e => e.Name)
           .HasColumnName("fullname")
           .HasMaxLength(150);
 
@@ -95,7 +98,10 @@ public class AppDbContext : DbContext
     entity.Property(e => e.AvailableForInterview)
           .HasColumnName("availableforinterview");
 
-    entity.Property(e => e.Summary)
+            entity.Property(e => e.IsActive)
+              .HasColumnName("isactive");
+
+            entity.Property(e => e.Summary)
           .HasColumnName("profilesummary");
             //entity.Property(e => e.CTSInternalInterviewerName).HasColumnName("ctsinternalinterviewername");
             //entity.Property(e => e.ClientInterviewerName).HasColumnName("clientinterviewername");
@@ -105,6 +111,8 @@ public class AppDbContext : DbContext
             //entity.Property(e => e.FinalStatus).HasColumnName("finalstatus");
             //entity.Property(e => e.BpssStatus).HasColumnName("bpssstatus");
         });
+
+        
 
         modelBuilder.Entity<CandidateStatusEvaluation>(entity =>
         {

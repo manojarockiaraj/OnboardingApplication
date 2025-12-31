@@ -1,36 +1,23 @@
 @model IEnumerable<OnboardingApp.Models.Candidate>
 @{
-    ViewData["Title"] = "Candidates";
+    ViewData["Title"] = "Candidates Full List";
     var jobId = ViewData["JobId"] as int?;
     var jobTitle = ViewData["JobTitle"] as string;
 }
 
-<h1>
-    Candidates
-    @if (!string.IsNullOrEmpty(jobTitle))
-    {
-        <text>for "@jobTitle"</text>
-    }
-</h1>
-
-@if (jobId == null)
-{
-    <p>Showing all candidates. You can filter by job using the Jobs list.</p>
-}
-else
-{
-   <p>Showing candidates matched to job: @jobTitle  @Model.FirstOrDefault()?.Skills</p>
-}
-
 <form asp-action="UpdateResumeStatus" method="post">
-    <input type="hidden" name="JobPostingId" value="@jobId" />
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Candidate Profiles</h1>
+        <div>
+            <a class="btn btn-primary" asp-action="Create">+ Add Candidate</a>
+        </div>
+    </div>
 
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>
-                    <input type="checkbox" id="selectAll" />
-                </th>
+                <th></th>
+                <th>Employee Id</th>
                 <th>Name</th>
                 <th>Skills</th>
                 <th>Email</th>
@@ -44,42 +31,22 @@ else
             {
                 var c = Model.ElementAt(i);
                 <tr>
-                    <td>
-                        <!-- Hidden input ensures unchecked checkbox posts false -->
-                        <input type="checkbox" name="Candidates[@i].IsSelected" value="true" @(c.IsSelected ? "checked" : "") />
-                        <input type="hidden" name="Candidates[@i].IsSelected" value="false" />
-                        <input type="hidden" name="Candidates[@i].Id" value="@c.Id" />
-                    </td>
 
+                    <td><input type="hidden" name="Candidates[@i].Id" value="@c.Id" /> </td>
+                    <td>@c.EmployeeId</td>
                     <td>@c.Name</td>
                     <td>@c.Skills</td>
                     <td>@c.Email</td>
                     <td>@c.Phone</td>
                     <td>@c.Location</td>
                     <td>
-                        <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@c.Id" asp-route-jobId="@jobId">Details</a>
+                        <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@c.Id">Edit</a>
+                        @*<a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@c.Id" asp-route-jobId="@jobId">Details</a>*@
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    @if (Model.Count() > 0)
-    {
-        <button type="submit" class="btn btn-success">
-            Update Resume Status
-        </button>
-    }
-    else
-    {
-        <p> No matching profiles found for this skillset</p>
-
-    }
 
 </form>
-
-@section Scripts {
-    <script>document.getElementById("selectAll").addEventListener("change", function () {
-            var checkboxes = document.querySelectorAll("input[name$='.IsSelected']");
-            checkboxes.forEach(cb => cb.checked = this.checked);
-        });</script>
-}
+ 

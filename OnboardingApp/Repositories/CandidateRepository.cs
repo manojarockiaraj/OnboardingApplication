@@ -16,13 +16,26 @@ public class CandidateRepository : ICandidateRepository
 
     public async Task<List<Candidate>> GetAllAsync()
     {
-        return await _db.Candidates.AsNoTracking().ToListAsync();
+        return await _db.Candidates.Where(e=>e.IsActive).AsNoTracking().ToListAsync();
     }
 
     public async Task<Candidate?> GetByIdAsync(int id)
     {
         return await _db.Candidates.FindAsync(id);
     }
+
+    public async Task AddAsync(Candidate candidate)
+    {
+        _db.Candidates.Add(candidate);
+        await _db.SaveChangesAsync();
+    }
+
+     public async Task UpdateAsync(Candidate candidate)
+    {
+        _db.Candidates.Update(candidate);
+        await _db.SaveChangesAsync();
+    }
+
 
     public async Task<List<CandidateStatusEvaluation?>> GetCandidateEvaluation(int candidateId, int jobPostingId)
     {
@@ -31,12 +44,6 @@ public class CandidateRepository : ICandidateRepository
                                  c.JobPostingId == jobPostingId)
                      .AsNoTracking()
                      .ToListAsync();
-    }
-
-    public async Task UpdateAsync(Candidate candidate)
-    {
-        _db.Candidates.Update(candidate);
-        await _db.SaveChangesAsync();
     }
  
     public async Task AddOrUpdateCandidateStatusAsync(CandidateStatusEvaluation updated)

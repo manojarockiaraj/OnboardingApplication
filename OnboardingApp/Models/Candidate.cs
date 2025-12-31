@@ -9,20 +9,29 @@ public class Candidate
     [Column("candidateid")]
     public int Id { get; set; }
 
+    [Column("employeeid")]
+    [Required(ErrorMessage = "Employee Id is Mandatory")]
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Employee Id must contain only numbers")]
+    public int EmployeeId { get; set; }
+
     [Column("fullname")]
+    [Required(ErrorMessage = "Full name is required")]
     [StringLength(150)]
     public string? Name { get; set; }
 
+    [StringLength(500, ErrorMessage = "Skills cannot exceed 500 characters")]
     [Column("skillset")]
-    [StringLength(500)]
+    [Required(ErrorMessage = "Skills is required")]
     [Display(Name = "Skills (comma-separated)")]
     public string? Skills { get; set; }
 
+    [EmailAddress(ErrorMessage = "Invalid email address")]
+    [Required(ErrorMessage = "Email is required")]
     [Column("contactemail")]
     [StringLength(150)]
-    [EmailAddress]
     public string? Email { get; set; }
 
+    [Phone(ErrorMessage = "Invalid phone number")]
     [Column("contactphone")]
     [StringLength(20)]
     public string? Phone { get; set; }
@@ -32,8 +41,10 @@ public class Candidate
     public string? Location { get; set; }
 
     [Column("availableforinterview")]
+    [Required(ErrorMessage = "Please select Yes or No")]
     public bool? AvailableForInterview { get; set; }
 
+    [StringLength(2000, ErrorMessage = "Summary is too long")]
     [Column("profilesummary")]
     public string? Summary { get; set; }
 
@@ -69,6 +80,10 @@ public class Candidate
 
     [NotMapped]
     public bool IsSelected { get; set; } = false;
+
+    [NotMapped]
+    [Column("isactive")]
+    public bool IsActive { get; set; } = true;
 
     [NotMapped]
     public JobPosting? JobPostingDetails { get; set; }

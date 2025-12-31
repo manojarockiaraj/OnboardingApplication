@@ -2,7 +2,8 @@ namespace OnboardingApp.Models;
 
 public class CandidateOverviewViewModel
 {
-    public int Id { get; set; }
+    public int Id { get; set; } // candidate ID
+    public int StatusId { get; set; }
     public int JobPostingId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;

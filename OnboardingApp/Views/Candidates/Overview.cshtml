@@ -95,18 +95,18 @@
                                 <a class="dropdown-item" asp-controller="Candidates" asp-action="Details" asp-route-jobId="@item.JobPostingId" asp-route-id="@item.Id">View</a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusModal-@item.Id">View Status</a>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#statusModal-@item.StatusId">View Status</a>
                             </li>
                         </ul>
                     </div>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="statusModal-@item.Id" tabindex="-1" aria-labelledby="statusModalLabel-@item.Id" aria-hidden="true">
+                    <div class="modal fade" id="statusModal-@item.StatusId" tabindex="-1" aria-labelledby="statusModalLabel-@item.StatusId" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content border-primary shadow-sm">
                                 <!-- Header -->
                                 <div class="modal-header bg-primary text-white">
-                                    <h5 class="modal-title" id="statusModalLabel-@item.Id">
+                                    <h5 class="modal-title" id="statusModalLabel-@item.StatusId">
                                         <i class="bi bi-person-badge me-2"></i> Status for @item.Name
                                     </h5>
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
