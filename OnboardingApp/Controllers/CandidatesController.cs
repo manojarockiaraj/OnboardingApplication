@@ -279,7 +279,7 @@ public class CandidatesController : Controller
                         ViewData["JobClientEvaluation"] = job.ClientEvaluation;
                     }
                 }
-                return View(updated);
+                //return View(updated);
             }
 
             // Ensure candidate exists in DB

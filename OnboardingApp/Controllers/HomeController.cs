@@ -52,6 +52,15 @@ public class HomeController : Controller
         return View();
     }
 
+    public async Task<IActionResult> OnBoarding()
+    {
+
+        var onboardingItems = await _onboardRepo.GetAllAsync();
+        ViewData["OnBoardingItems"] = onboardingItems;
+
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
