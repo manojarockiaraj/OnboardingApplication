@@ -58,7 +58,14 @@ else
                     <td>@c.Phone</td>   
                     <td>@c.Location</td>
                     <td>
-                        <a class="btn btn-sm btn-primary" asp-action="MapEmployeeToJob" asp-route-id="@c.Id" asp-route-jobId="@jobId">Assign</a>
+                        @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("AccountManager"))
+                        {
+                            <a class="btn btn-sm btn-primary" asp-action="MapEmployeeToJob" asp-route-id="@c.Id" asp-route-jobId="@jobId">Assign</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-primary" disabled>Assign</button>
+                        }
                     </td>
                 </tr>
             }
@@ -66,9 +73,18 @@ else
     </table>
     @if (Model.Count() == 100)
     {
-        <button type="submit" class="btn btn-success">
-            Update Resume Status
-        </button>
+        @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("AccountManager"))
+        {
+            <button type="submit" class="btn btn-success">
+                Update Resume Status
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-success" disabled>
+                Update Resume Status
+            </button>
+        }
     }
     else
     {

@@ -4,12 +4,19 @@ using OnboardingApp.Services;
 using OnboardingApp.Data;
 using Microsoft.EntityFrameworkCore;
 using OnboardingApp.Repositories;
+using OnboardingApp.Models;
 
 
 AppContext.SetSwitch("System.Net.DisableIPv6", true);
 AppContext.SetSwitch("System.Net.Sockets.DisableDualMode", true);
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Bind DemoUsers section
+var demoUsers = new List<DemoUserConfig>();
+builder.Configuration.GetSection("DemoUsers").Bind(demoUsers);
+// register as singleton
+builder.Services.AddSingleton(demoUsers);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>

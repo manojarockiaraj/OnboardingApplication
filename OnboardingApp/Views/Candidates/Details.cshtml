@@ -7,6 +7,14 @@
     bool showClientInterview = jobClientEvalObj is bool b && b;
 
     var evaluation = Model.CandidateStatusEvaluations?.FirstOrDefault();
+
+    bool isAccountManager = User?.Identity?.IsAuthenticated == true && User.IsInRole("AccountManager");
+    bool canSubmit = false;
+    if (evaluation != null)
+    {
+        canSubmit = (evaluation.CtsInternalInterviewStatus == OnboardingApp.Models.CtsInternalInterviewStatus.Completed || 
+            evaluation.CtsInternalInterviewStatus == OnboardingApp.Models.CtsInternalInterviewStatus.Selected) && evaluation.SecurityCheckStatus == OnboardingApp.Models.SecurityCheckStatus.Cleared;
+    }
 }
 
 @functions {
@@ -216,26 +224,20 @@ else
     <form asp-action="SubmitOnboarding" method="post">
         <input type="hidden" name="id" value="@Model.Id" />
 
+      
+        @if (isAccountManager)
+        {
+            <button type="submit" class="btn btn-success me-2" @(canSubmit ? "" : "disabled")>Submit Onboarding Request</button>
 
-        @if (!Model.AcknowledgmentConfirmed)
-            {
-        <button type="submit"
-                class="btn btn-success me-2"
-                @(evaluation.FinalStatus == OnboardingApp.Models.FinalStatus.InProgress && evaluation.SecurityCheckStatus == OnboardingApp.Models.SecurityCheckStatus.Cleared ? "" : "disabled")>
-            Submit Onboarding Request
-        </button>
+            <a class="btn btn-primary me-2" asp-action="EditStatus" asp-route-id="@Model.Id" asp-route-jobId="@ViewData["JobId"]">Edit Status</a>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-success me-2" disabled>Submit Onboarding Request</button>
 
-        <a class="btn btn-primary me-2"
-           asp-action="EditStatus"
-           asp-route-id="@Model.Id"
-           asp-route-jobId="@ViewData["JobId"]">
-            Edit Status
-        </a>
-            }
-        <a class="btn btn-secondary"
-           asp-action="Index"
-           asp-route-jobId="@ViewData["JobId"]">
-            Back
-        </a>
+            <button class="btn btn-primary me-2" disabled>Edit Status</button>
+        }
+
+        <a class="btn btn-secondary" asp-action="Index" asp-route-jobId="@ViewData["JobId"]">Back</a>
     </form>
 }

@@ -3,6 +3,7 @@ using OnboardingApp.Models;
 using OnboardingApp.Data;
 using Microsoft.EntityFrameworkCore;
 using OnboardingApp.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OnboardingApp.Controllers;
 
@@ -27,6 +28,7 @@ public class JobsController : Controller
         return View(jobs);
     }
 
+    [Authorize(Roles = "Operation,AccountManager")]
     public async Task<IActionResult> Edit(int id)
     {
         var job = await _repo.GetByIdAsync(id);
@@ -37,6 +39,7 @@ public class JobsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Operation,AccountManager")]
     public async Task<IActionResult> Edit(int id, JobPosting updated)
     {
         if (id != updated.Id) return BadRequest();
@@ -68,6 +71,7 @@ public class JobsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize(Roles = "Operation,AccountManager")]
     public IActionResult Create()
     {
         PopulateDropdowns();
@@ -76,6 +80,7 @@ public class JobsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Operation,AccountManager")]
     public async Task<IActionResult> Create(JobPosting job)
     {
         if (!ModelState.IsValid)

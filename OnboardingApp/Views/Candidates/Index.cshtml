@@ -9,7 +9,14 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="mb-0">Candidate Profiles</h1>
         <div>
-            <a class="btn btn-primary" asp-action="Create">+ Add Candidate</a>
+            @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Operation") || User.IsInRole("AccountManager")))
+            {
+                <a class="btn btn-primary" asp-action="Create">+ Add Candidate</a>
+            }
+            else
+            {
+                <button class="btn btn-primary" disabled>+ Add Candidate</button>
+            }
         </div>
     </div>
 
@@ -40,7 +47,14 @@
                     <td>@c.Phone</td>
                     <td>@c.Location</td>
                     <td>
-                        <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@c.Id">Edit</a>
+                        @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Operation") || User.IsInRole("AccountManager")))
+                        {
+                            <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@c.Id">Edit</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-secondary" disabled>Edit</button>
+                        }
                         @*<a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@c.Id" asp-route-jobId="@jobId">Details</a>*@
                     </td>
                 </tr>
@@ -49,4 +63,3 @@
     </table>
 
 </form>
- 
