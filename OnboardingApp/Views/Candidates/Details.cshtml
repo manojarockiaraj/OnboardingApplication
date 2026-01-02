@@ -216,6 +216,9 @@ else
     <form asp-action="SubmitOnboarding" method="post">
         <input type="hidden" name="id" value="@Model.Id" />
 
+
+        @if (!Model.AcknowledgmentConfirmed)
+            {
         <button type="submit"
                 class="btn btn-success me-2"
                 @(evaluation.FinalStatus == OnboardingApp.Models.FinalStatus.InProgress && evaluation.SecurityCheckStatus == OnboardingApp.Models.SecurityCheckStatus.Cleared ? "" : "disabled")>
@@ -228,7 +231,7 @@ else
            asp-route-jobId="@ViewData["JobId"]">
             Edit Status
         </a>
-
+            }
         <a class="btn btn-secondary"
            asp-action="Index"
            asp-route-jobId="@ViewData["JobId"]">

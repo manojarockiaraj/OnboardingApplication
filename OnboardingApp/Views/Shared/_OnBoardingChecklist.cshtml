@@ -2,10 +2,13 @@
 
 @{
     // Make a safe list
-    var items = Model?.ToList() ?? new List<OnboardingApp.Models.OnBoardingList>();
+    var candidate = ViewData["Candidate"] as Candidate;
+    var items = ViewData["OnBoardingItems"] as IEnumerable<OnboardingApp.Models.OnBoardingList>;
+
 
     // Summary counts
-    var totalItems = items.Count;
+
+    var totalItems = items.Count();
     var completedItems = items.Count(x => !x.isactive);
     var pendingItems = totalItems - completedItems;
 
@@ -29,32 +32,32 @@ else
     <!-- ================= SUMMARY ================= -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="mb-1">Welcome Aboard 👋</h4>
-            <p class="text-muted mb-3">
-                Here's your onboarding progress
-            </p>
+            <h4 class="mb-1">Welcome Aboard 👋 </h4>  <h1>@candidate?.Name</h1>
+            @* <p class="text-muted mb-3">
+                     Here's your onboarding progress
+                 </p>
 
-            <div class="row text-center mb-3">
-                <div class="col">
-                    <h5>@totalItems</h5>
-                    <small class="text-muted">Total</small>
-                </div>
-                <div class="col">
-                    <h5>@completedItems</h5>
-                    <small class="text-muted">Completed</small>
-                </div>
-                <div class="col">
-                    <h5>@pendingItems</h5>
-                    <small class="text-muted">Pending</small>
-                </div>
-            </div>
+                <div class="row text-center mb-3">
+                     <div class="col">
+                         <h5>@totalItems</h5>
+                         <small class="text-muted">Total</small>
+                     </div>
+                     <div class="col">
+                         <h5>@completedItems</h5>
+                         <small class="text-muted">Completed</small>
+                     </div>
+                     <div class="col">
+                         <h5>@pendingItems</h5>
+                         <small class="text-muted">Pending</small>
+                     </div>
+                 </div>
 
-            <div class="progress">
-                <div class="progress-bar bg-success"
-                     role="progressbar"
-                     style="width:@(totalItems == 0 ? 0 : completedItems * 100 / totalItems)%">
-                </div>
-            </div>
+                 <div class="progress">
+                     <div class="progress-bar bg-success"
+                          role="progressbar"
+                          style="width:@(totalItems == 0 ? 0 : completedItems * 100 / totalItems)%">
+                     </div>
+                 </div>*@
         </div>
     </div>
 
@@ -121,8 +124,10 @@ else
             <!-- Text & URL items -->
             <div class="card mb-4 shadow-sm">
                 <div class="card-header d-flex justify-content-between">
-                    <span class="fw-bold">@typeGroup.Key</span>
-                    <span class="badge bg-secondary">@typeGroup.Count()</span>
+
+                    <span class="fw-bold">@(typeGroup.Key =="URL" ? "Training" : "Policies")</span>
+                    <!--<span class="fw-bold">@typeGroup.Key</span>-->
+                    @*<span class="badge bg-secondary">@typeGroup.Count()</span>*@
                 </div>
 
                 <ul class="list-group list-group-flush">
@@ -146,5 +151,52 @@ else
                 </ul>
             </div>
         }
+    }
+
+    @if (candidate != null)
+    {
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header d-flex justify-content-between">
+
+                <span class="fw-bold">Acknowledgement</span>
+                
+            </div>
+
+            <ul class="list-group list-group-flush">
+                
+                    <li class="list-group-item">
+
+                        <form asp-action="ConfirmAcknowledgement" method="post">
+                            <div class="text-muted small">
+                                Confirm and accept your acknowledgement of service.
+                            </div>
+
+                            <!-- Yes/No Options -->
+                            <input type="radio" name="AcknowledgmentConfirmed" value="true" id="ackYes" @(candidate.AcknowledgmentConfirmed ? "checked" : "") />
+                            <label for="ackYes">Yes</label>
+
+                            <input type="radio" name="AcknowledgmentConfirmed" value="false" id="ackNo" @(!candidate.AcknowledgmentConfirmed ? "checked" : "") />
+                            <label for="ackNo">No</label>
+
+                            <input type="hidden" name="Id" value="@candidate.Id" />
+
+
+                            <!-- Accept / Reject Buttons -->
+                            <div class="mt-3">
+                                <button type="submit" class="btn btn-success me-2">
+                                    <i class="fas fa-check me-1"></i> Accept
+                                </button>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-times me-1"></i> Reject
+                                </button>
+                            </div>
+                        </form>
+
+                    </li>
+                
+            </ul>
+        </div>
+
     }
 }

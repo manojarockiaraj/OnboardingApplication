@@ -51,6 +51,9 @@ public class Candidate
     [Required(ErrorMessage = "Please select whether available for interview")]
     public bool? AvailableForInterview { get; set; }
 
+    [Column("acknowledgmentconfirmed")]
+    public bool AcknowledgmentConfirmed { get; set; } = false;
+
     [StringLength(2000, ErrorMessage = "Summary is too long")]
     [Column("profilesummary")]
     public string? Summary { get; set; }
