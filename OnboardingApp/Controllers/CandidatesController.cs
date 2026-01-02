@@ -399,22 +399,39 @@ public class CandidatesController : Controller
 
     }
 
-    public IActionResult Create()
+    public async Task<IActionResult> Create(int? jobId = null)
     {
-        return View();
+        if (jobId.HasValue)
+        {
+            var candidate = new Candidate();
+            var job = await _jobRepository.GetByIdAsync(jobId.Value);
+            candidate.JobPostingDetails = job;
+            return View(candidate);
+        }
+        else
+        {
+            return View();
+        }
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Candidate candidate)
+    public async Task<IActionResult> Create(Candidate candidate, int? jobId = null)
     {
         if (!ModelState.IsValid)
         {
             return View(candidate);
         }
 
-        await _candidateRepository.AddAsync(candidate);
-        return RedirectToAction(nameof(Index));
+        var candidateId = await _candidateRepository.AddAsync(candidate);
+        if (jobId.HasValue)
+        {
+            return RedirectToAction(nameof(MapEmployeeToJob), new { id = candidateId, jobId = jobId.Value });
+        }
+        else
+        {
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     public async Task<IActionResult> Edit(int id)
