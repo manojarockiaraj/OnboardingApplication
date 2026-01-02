@@ -1,0 +1,16 @@
+﻿@using OnboardingApp.Models
+@{
+    ViewData["Title"] = "On Boarding Form";
+}
+
+@{
+}
+
+<div class="section-card">
+    <div class="card-header">
+        <h3 class="section-title"></h3>
+    </div>
+    <div class="card-content">
+        @await Html.PartialAsync("_OnBoardingChecklist", ViewData["OnBoardingItems"] as IEnumerable<OnboardingApp.Models.OnBoardingList>)
+    </div>
+</div>
