@@ -7,75 +7,127 @@
 
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
-    <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+     @await Html.PartialAsync("_FormValidationSummary")
+
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="Skills" class="form-label"></label>
+            <input asp-for="Skills" class="form-control" />
+            <span asp-validation-for="Skills" class="text-danger"></span>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Skills" class="form-label"></label>
-        <input asp-for="Skills" class="form-control" />
-        <span asp-validation-for="Skills" class="text-danger"></span>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="ClientName" class="form-label"></label>
+            <input asp-for="ClientName" class="form-control" />
+            <span asp-validation-for="ClientName" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="ClientContact" class="form-label"></label>
+            <input asp-for="ClientContact" class="form-control" />
+            <span asp-validation-for="ClientContact" class="text-danger"></span>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="ClientName" class="form-label"></label>
-        <input asp-for="ClientName" class="form-control" />
-        <span asp-validation-for="ClientName" class="text-danger"></span>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Location" class="form-label"></label>
+            <input asp-for="Location" class="form-control" />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="StartDate" class="form-label"></label>
+            <input asp-for="StartDate" class="form-control" type="date" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="ClientContact" class="form-label"></label>
-        <input asp-for="ClientContact" class="form-control" />
-        <span asp-validation-for="ClientContact" class="text-danger"></span>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Client Evaluation</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="true" id="clientEvalYes" />
+                <label class="form-check-label" for="clientEvalYes">Yes</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="false" id="clientEvalNo" />
+                <label class="form-check-label" for="clientEvalNo">No</label>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="ClientContract" class="form-label"></label>
+            <select asp-for="ClientContract" class="form-select" asp-items="new SelectList(ViewBag.ClientContracts)">
+                <option value="">-- Select Contract --</option>
+            </select>
+            <span asp-validation-for="ClientContract" class="text-danger"></span>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Location" class="form-label"></label>
-        <input asp-for="Location" class="form-control" />
-        <span asp-validation-for="Location" class="text-danger"></span>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="WorkModel" class="form-label"></label>
+            <select asp-for="WorkModel" class="form-select" asp-items="new SelectList(ViewBag.WorkModels)">
+                <option value="">-- Select Work Model --</option>
+            </select>
+            <span asp-validation-for="WorkModel" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <!-- placeholder -->
+        </div>
     </div>
+
     <div class="mb-3">
         <label asp-for="Description" class="form-label"></label>
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="StartDate" class="form-label"></label>
-        <input asp-for="StartDate" class="form-control" type="date" />
-        <span asp-validation-for="StartDate" class="text-danger"></span>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Client Evaluation</label>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="true" id="clientEvalYes" />
-            <label class="form-check-label" for="clientEvalYes">Yes</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="false" id="clientEvalNo" />
-            <label class="form-check-label" for="clientEvalNo">No</label>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="ClientContract" class="form-label"></label>
-        <select asp-for="ClientContract" class="form-select" asp-items="new SelectList(ViewBag.ClientContracts)">
-            <option value="">-- Select Contract --</option>
-        </select>
-        <span asp-validation-for="ClientContract" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="WorkModel" class="form-label"></label>
-        <select asp-for="WorkModel" class="form-select" asp-items="new SelectList(ViewBag.WorkModels)">
-            <option value="">-- Select Work Model --</option>
-        </select>
-        <span asp-validation-for="WorkModel" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            var summary = document.getElementById('validationSummary');
+
+            function applyInvalidState() {
+                var lis = summary.querySelectorAll('li');
+                if (lis.length) {
+                    summary.classList.remove('d-none');
+                }
+                var errors = document.querySelectorAll('.text-danger');
+                errors.forEach(function (err) {
+                    if (err.textContent.trim().length > 0) {
+                        var container = err.closest('.mb-3');
+                        if (container) {
+                            var input = container.querySelector('input, textarea, select');
+                            if (input) input.classList.add('is-invalid');
+                        }
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                applyInvalidState();
+                var form = document.querySelector('form[asp-action="Edit"]') || document.querySelector('form');
+                if (form) {
+                    form.addEventListener('submit', function () {
+                        setTimeout(applyInvalidState, 50);
+                    });
+                }
+            });
+        })();
+    </script>
 }

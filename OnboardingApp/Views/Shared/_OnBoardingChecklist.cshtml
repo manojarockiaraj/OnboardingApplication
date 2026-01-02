@@ -1,0 +1,139 @@
+@model IEnumerable<OnboardingApp.Models.OnBoardingList>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-secondary">
+        No onboarding items to show.
+    </div>
+}
+else
+{
+    var totalItems = Model.Count();
+
+    // Completed = isactive == false
+    var completedItems = Model.Count(x => !x.isactive);
+
+    // Null-safe welcome pack detection
+    var welcomePackItems = Model
+        .Where(x => !string.IsNullOrWhiteSpace(x.title)
+                 && x.title.Contains("Welcome", StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    <!-- SUMMARY HEADER -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title mb-2">Welcome Aboard 👋</h4>
+            <p class="text-muted mb-3">
+                Here’s a quick overview of your onboarding progress.
+            </p>
+
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <h5>@totalItems</h5>
+                    <small class="text-muted">Total Items</small>
+                </div>
+                <div class="col-md-4">
+                    <h5>@completedItems</h5>
+                    <small class="text-muted">Completed</small>
+                </div>
+                <div class="col-md-4">
+                    <h5>@(totalItems - completedItems)</h5>
+                    <small class="text-muted">Pending</small>
+                </div>
+            </div>
+
+            <div class="progress mt-3">
+                <div class="progress-bar bg-success"
+                     role="progressbar"
+                     style="width:@((completedItems * 100) / totalItems)%">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPTIONAL WELCOME PACK -->
+    @if (welcomePackItems.Any())
+    {
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                🎁 Welcome Pack
+            </div>
+            <ul class="list-group list-group-flush">
+                @foreach (var item in welcomePackItems)
+                {
+                    <li class="list-group-item">
+                        <strong>@item.title</strong>
+                        <div class="text-muted small">@item.description</div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+    <!-- ONBOARDING ITEMS BY TYPE -->
+    @foreach (var group in Model
+       .Where(x => !string.IsNullOrWhiteSpace(x.title)
+                && x.title.Contains("Welcome", StringComparison.OrdinalIgnoreCase))
+       .GroupBy(x => x.type))
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-bold">@group.Key</span>
+                <span class="badge bg-secondary">@group.Count()</span>
+            </div>
+
+            <ul class="list-group list-group-flush">
+                @foreach (var item in group.OrderBy(x => x.Id))
+                {
+                    <li class="list-group-item">
+                        <div class="d-flex align-items-start gap-2">
+
+                            <!-- CHECKBOX TYPE -->
+                            @if (item.type.Equals("Checkbox", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <input type="checkbox"
+                                       class="form-check-input mt-1"
+                                       disabled
+                                       checked="@(!item.isactive)" />
+
+                                <div>
+                                    <div class="fw-semibold">@item.title</div>
+                                    <small class="text-muted">@item.description</small>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="w-100">
+                                    <div class="fw-semibold">@item.title</div>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.description))
+                                    {
+                                        @if (item.type.Equals("URL", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <a href="@item.description"
+                                               target="_blank"
+                                               class="link-primary">
+                                                Open Resource
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted small">
+                                                @item.description
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            }
+
+                            @if (!item.isactive)
+                            {
+                                <span class="badge bg-success ms-auto">Done</span>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+}

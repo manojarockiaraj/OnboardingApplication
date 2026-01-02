@@ -20,6 +20,12 @@ builder.Services.AddControllersWithViews(options =>
         .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
 });
+
+builder.Services
+    .AddControllersWithViews()
+    .AddDataAnnotationsLocalization();
+
+
 // Register email service
 builder.Services.AddTransient<IEmailService, SmtpEmailService>();
 
@@ -42,8 +48,8 @@ if (!string.IsNullOrEmpty(conn))
     // Optional: test connection immediately
     try
     {
-        using var testConn = new Npgsql.NpgsqlConnection(conn);
-        testConn.Open();
+        //using var testConn = new Npgsql.NpgsqlConnection(conn);
+        //testConn.Open();
         Console.WriteLine("Database connection successful!");
     }
     catch (Exception ex)
@@ -63,6 +69,9 @@ if (!string.IsNullOrEmpty(conn))
 
 // Register repositories
 builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<ICandidateRepository, CandidateRepository>();
+builder.Services.AddScoped<IOnBoardingRepository, OnBoardingRepository>();
+ 
 
 // Add authentication
 builder.Services.AddAuthentication("CookieAuth")
@@ -78,6 +87,11 @@ var app = builder.Build();
 app.MapGet("/JobPosting", async (AppDbContext db) =>
 {
     return await db.JobPostings.AsNoTracking().Take(10).ToListAsync();
+});
+
+app.MapGet("/OnBoardingList", async (IOnBoardingRepository repo) =>
+{
+    return await repo.GetAllAsync();
 });
 
 // Configure the HTTP request pipeline.

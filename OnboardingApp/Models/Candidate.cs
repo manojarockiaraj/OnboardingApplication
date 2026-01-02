@@ -1,45 +1,93 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnboardingApp.Models;
 
 public class Candidate
 {
+    [Key]
+    [Column("candidateid")]
     public int Id { get; set; }
 
-    [Required]
-    public string Name { get; set; } = string.Empty;
+    [Column("employeeid")]
+    [Required(ErrorMessage = "Employee Id is Mandatory")]
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "Employee Id must contain only numbers")]
+    public int EmployeeId { get; set; }
 
+    [Column("fullname")]
+    [Required(ErrorMessage = "Full name is required")]
+    [StringLength(150)]
+    public string? Name { get; set; }
+
+    [StringLength(500, ErrorMessage = "Skills cannot exceed 500 characters")]
+    [Column("skillset")]
+    [Required(ErrorMessage = "Skills is required")]
     [Display(Name = "Skills (comma-separated)")]
-    public string Skills { get; set; } = string.Empty;
+    public string? Skills { get; set; }
 
-    public string Email { get; set; } = string.Empty;
+    [EmailAddress(ErrorMessage = "Invalid email address")]
+    [Required(ErrorMessage = "Email is required")]
+    [Column("contactemail")]
+    [StringLength(150)]
+    public string? Email { get; set; }
 
-    public string Phone { get; set; } = string.Empty;
+    [Phone(ErrorMessage = "Invalid phone number")]
+    [Column("contactphone")]
+    [StringLength(20)]
+    public string? Phone { get; set; }
 
-    public string Location { get; set; } = string.Empty;
+    [Column("residence")]
+    [StringLength(150)]
+    public string? Location { get; set; }
 
-    public string Summary { get; set; } = string.Empty;
+    [Column("availableforinterview")]
+    [Required(ErrorMessage = "Please select Yes or No")]
+    public bool? AvailableForInterview { get; set; }
 
-    // Interviewer names
+    [StringLength(2000, ErrorMessage = "Summary is too long")]
+    [Column("profilesummary")]
+    public string? Summary { get; set; }
+
+
+    [NotMapped]
     [Display(Name = "Cognizant Internal Interviewer Name")]
     public string CTSInternalInterviewerName { get; set; } = string.Empty;
 
+    [NotMapped]
     [Display(Name = "Client Interviewer Name")]
     public string ClientInterviewerName { get; set; } = string.Empty;
 
-    // Status fields
+
+    [NotMapped]
     [Display(Name = "Resume Filter")]
-    public StageStatus ResumeFilterStatus { get; set; } = StageStatus.Unknown;
+    public ResumeStatus ResumeFilterStatus { get; set; } = ResumeStatus.Submitted;
 
+    [NotMapped]
     [Display(Name = "Cognizant Interview")]
-    public StageStatus Level1Status { get; set; } = StageStatus.Unknown;
+    public CtsInternalInterviewStatus Level1Status { get; set; } = CtsInternalInterviewStatus.NA;
 
+    [NotMapped]
     [Display(Name = "Client Interview")]
-    public StageStatus Level2Status { get; set; } = StageStatus.Unknown;
+    public ClientInterviewStatus Level2Status { get; set; } = ClientInterviewStatus.NA;
 
+    [NotMapped]
     [Display(Name = "Final Status")]
-    public StageStatus FinalStatus { get; set; } = StageStatus.Unknown;
+    public FinalStatus FinalStatus { get; set; } = FinalStatus.NA;
 
+    [NotMapped]
     [Display(Name = "BPSS Status")]
-    public StageStatus BpssStatus { get; set; } = StageStatus.Unknown;
+    public SecurityCheckStatus BpssStatus { get; set; } = SecurityCheckStatus.NA;
+
+    [NotMapped]
+    public bool IsSelected { get; set; } = false;
+
+    [NotMapped]
+    [Column("isactive")]
+    public bool IsActive { get; set; } = true;
+
+    [NotMapped]
+    public JobPosting? JobPostingDetails { get; set; }
+
+    public List<CandidateStatusEvaluation>? CandidateStatusEvaluations { get; set; }
 }
+        

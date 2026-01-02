@@ -1,0 +1,86 @@
+﻿@model IEnumerable<OnboardingApp.Models.Candidate>
+@{
+    ViewData["Title"] = "Candidates";
+    var jobId = ViewData["JobId"] as int?;
+    var jobTitle = ViewData["JobTitle"] as string;
+}
+
+<h1>
+    Candidates
+    @if (!string.IsNullOrEmpty(jobTitle))
+    {
+        <text>for "@jobTitle"</text>
+    }
+</h1>
+
+@if (jobId == null)
+{
+    <p>Showing all candidates. You can filter by job using the Jobs list.</p>
+}
+else
+{
+    <p>Showing candidates matched to job: @jobTitle  @Model.FirstOrDefault()?.Skills</p>
+}
+
+<form asp-action="UpdateResumeStatus" method="post">
+    <input type="hidden" name="JobPostingId" value="@jobId" />
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="display:none">
+                    <input type="checkbox" id="selectAll" />
+                </th>
+                <th>Employee Id</th>
+                <th>Name</th>
+                <th>Skills</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Location</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                var c = Model.ElementAt(i);
+                <tr>
+                    <td  style="display:none">
+                        <!-- Hidden input ensures unchecked checkbox posts false -->
+                        <input type="checkbox" name="Candidates[@i].IsSelected" value="true" @(c.IsSelected ? "checked" : "") />
+                        <input type="hidden" name="Candidates[@i].IsSelected" value="false" />
+                        <input type="hidden" name="Candidates[@i].Id" value="@c.Id" />
+                    </td>
+                    <td>@c.EmployeeId</td>
+                    <td>@c.Name</td>
+                    <td>@c.Skills</td>
+                    <td>@c.Email</td>
+                    <td>@c.Phone</td>   
+                    <td>@c.Location</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" asp-action="MapEmployeeToJob" asp-route-id="@c.Id" asp-route-jobId="@jobId">Allocate</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Model.Count() == 100)
+    {
+        <button type="submit" class="btn btn-success">
+            Update Resume Status
+        </button>
+    }
+    else
+    {
+        @*<p> No matching profiles found for this skillset</p>*@
+
+    }
+
+</form>
+
+@section Scripts {
+    <script>document.getElementById("selectAll").addEventListener("change", function () {
+            var checkboxes = document.querySelectorAll("input[name$='.IsSelected']");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });</script>
+}

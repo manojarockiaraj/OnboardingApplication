@@ -1,45 +1,52 @@
 @model IEnumerable<OnboardingApp.Models.Candidate>
 @{
-    ViewData["Title"] = "Candidates";
+    ViewData["Title"] = "Candidates Full List";
     var jobId = ViewData["JobId"] as int?;
     var jobTitle = ViewData["JobTitle"] as string;
 }
 
-<h1>Candidates @if(!string.IsNullOrEmpty(jobTitle)){ <text>for "@jobTitle"</text> }</h1>
+<form asp-action="UpdateResumeStatus" method="post">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Candidate Profiles</h1>
+        <div>
+            <a class="btn btn-primary" asp-action="Create">+ Add Candidate</a>
+        </div>
+    </div>
 
-@if (jobId == null)
-{
-    <p>Showing all candidates. You can filter by job using the Jobs list.</p>
-}
-else
-{
-    <p>Showing candidates matched to job: @jobTitle</p>
-}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Employee Id</th>
+                <th>Name</th>
+                <th>Skills</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Location</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                var c = Model.ElementAt(i);
+                <tr>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Skills</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Location</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach(var c in Model)
-    {
-        <tr>
-            <td>@c.Name</td>
-            <td>@c.Skills</td>
-            <td>@c.Email</td>
-            <td>@c.Phone</td>
-            <td>@c.Location</td>
-            <td>
-                <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@c.Id" asp-route-jobId="@jobId">Details</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+                    <td><input type="hidden" name="Candidates[@i].Id" value="@c.Id" /> </td>
+                    <td>@c.EmployeeId</td>
+                    <td>@c.Name</td>
+                    <td>@c.Skills</td>
+                    <td>@c.Email</td>
+                    <td>@c.Phone</td>
+                    <td>@c.Location</td>
+                    <td>
+                        <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@c.Id">Edit</a>
+                        @*<a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@c.Id" asp-route-jobId="@jobId">Details</a>*@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</form>
+ 

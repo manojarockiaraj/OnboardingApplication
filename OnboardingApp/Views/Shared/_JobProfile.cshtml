@@ -1,0 +1,55 @@
+﻿@model OnboardingApp.Models.JobPosting
+
+@if (Model != null)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white d-flex align-items-center">
+            <i class="bi bi-briefcase-fill me-2"></i>
+            <span class="me-2 fw-bold" style="font-size: 1rem;">Job Profile:</span>
+            <h5 class="mb-0 fw-bold" style="font-size: 1rem;">@Model.Title</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-6 d-flex">
+                    <i class="bi bi-hash me-2 text-muted" style="min-width: 20px;"></i>
+                    <div class="text-muted me-2" style="min-width: 100px;">Job Id:</div>
+                    <div class="fw-bold">@Model.Id</div>
+                </div>
+
+                <div class="col-md-6 d-flex">
+                    <i class="bi bi-card-text me-2 text-muted" style="min-width: 20px;"></i>
+                    <div class="text-muted me-2" style="min-width: 100px;">Title:</div>
+                    <div class="fw-bold">@Model.Title</div>
+                </div>
+
+                <div class="col-md-6 d-flex">
+                    <i class="bi bi-gear-fill me-2 text-muted" style="min-width: 20px;"></i>
+                    <div class="text-muted me-2" style="min-width: 100px;">Skills:</div>
+                    <div class="fw-bold">@Model.Skills</div>
+                </div>
+
+                <div class="col-md-6 d-flex">
+                    <i class="bi bi-person-fill me-2 text-muted" style="min-width: 20px;"></i>
+                    <div class="text-muted me-2" style="min-width: 100px;">Client Name:</div>
+                    <div class="fw-bold">@Model.ClientName</div>
+                </div>
+
+                <div class="col-12 d-flex">
+                    <i class="bi bi-geo-alt-fill me-2 text-muted" style="min-width: 20px;"></i>
+                    <div class="text-muted me-2" style="min-width: 100px;">Job Location:</div>
+                    <div class="fw-bold">@Model.Location</div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="col-12 d-flex mt-3">
+                        <i class="bi bi-file-text-fill me-2 text-muted" style="min-width: 20px;"></i>
+                        <div class="text-muted me-2" style="min-width: 100px;">Description:</div>
+                        <div class="fw-bold">@Model.Description</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

@@ -18,7 +18,7 @@ public class JobsController : Controller
     private void PopulateDropdowns()
     {
         ViewBag.ClientContracts = new List<string> { "Multicapability", "ESFA" };
-        ViewBag.WorkModels = new List<string> { "Hybrid", "Remote" };
+        ViewBag.WorkModels = new List<string> { "Hybrid", "Remote" , "Onsite" };
     }
 
     public async Task<IActionResult> Index()
@@ -64,6 +64,7 @@ public class JobsController : Controller
 
         await _repo.UpdateAsync(job);
 
+        TempData["SuccessMessage"] = "Job updated successfully.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -83,6 +84,7 @@ public class JobsController : Controller
             return View(job);
         }
         await _repo.AddAsync(job);
+        TempData["SuccessMessage"] = "Job created successfully.";
         return RedirectToAction(nameof(Index));
     }
 }
