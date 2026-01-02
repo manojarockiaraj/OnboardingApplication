@@ -32,7 +32,7 @@ else
     <!-- ================= SUMMARY ================= -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h4 class="mb-1">Welcome Aboard 👋 </h4>  <h1>@candidate?.Name</h1>
+           <h4 class="mb-1">Welcome Aboard 👋 </h4>  @* <h1>@candidate?.Name</h1>*@
             @* <p class="text-muted mb-3">
                      Here's your onboarding progress
                  </p>
@@ -60,6 +60,13 @@ else
                  </div>*@
         </div>
     </div>
+
+    @if (candidate != null)
+    {
+        @await Html.PartialAsync("_CandidateProfile", candidate)
+    }
+
+
 
     <!-- ================= WELCOME PACK ================= -->
     @if (welcomePack.Any())
@@ -160,41 +167,41 @@ else
             <div class="card-header d-flex justify-content-between">
 
                 <span class="fw-bold">Acknowledgement</span>
-                
+
             </div>
 
             <ul class="list-group list-group-flush">
-                
-                    <li class="list-group-item">
 
-                        <form asp-action="ConfirmAcknowledgement" method="post">
-                            <div class="text-muted small">
-                                Confirm and accept your acknowledgement of service.
-                            </div>
+                <li class="list-group-item">
 
-                            <!-- Yes/No Options -->
-                            <input type="radio" name="AcknowledgmentConfirmed" value="true" id="ackYes" @(candidate.AcknowledgmentConfirmed ? "checked" : "") />
-                            <label for="ackYes">Yes</label>
+                    <form asp-action="ConfirmAcknowledgement" method="post">
+                        <div class="text-muted small">
+                            Confirm and accept your acknowledgement of service.
+                        </div>
 
-                            <input type="radio" name="AcknowledgmentConfirmed" value="false" id="ackNo" @(!candidate.AcknowledgmentConfirmed ? "checked" : "") />
-                            <label for="ackNo">No</label>
+                        <!-- Yes/No Options -->
+                        <input type="radio" name="AcknowledgmentConfirmed" value="true" id="ackYes" @(candidate.AcknowledgmentConfirmed ? "checked" : "") />
+                        <label for="ackYes">Yes</label>
 
-                            <input type="hidden" name="Id" value="@candidate.Id" />
+                        <input type="radio" name="AcknowledgmentConfirmed" value="false" id="ackNo" @(!candidate.AcknowledgmentConfirmed ? "checked" : "") />
+                        <label for="ackNo">No</label>
+
+                        <input type="hidden" name="Id" value="@candidate.Id" />
 
 
-                            <!-- Accept / Reject Buttons -->
-                            <div class="mt-3">
-                                <button type="submit" class="btn btn-success me-2">
-                                    <i class="fas fa-check me-1"></i> Accept
-                                </button>
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-times me-1"></i> Reject
-                                </button>
-                            </div>
-                        </form>
+                        <!-- Accept / Reject Buttons -->
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-success me-2">
+                                <i class="fas fa-check me-1"></i> Accept
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times me-1"></i> Reject
+                            </button>
+                        </div>
+                    </form>
 
-                    </li>
-                
+                </li>
+
             </ul>
         </div>
 
