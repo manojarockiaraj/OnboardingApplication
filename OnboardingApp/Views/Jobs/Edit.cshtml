@@ -5,7 +5,7 @@
 
 <h1>Edit Job</h1>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" id="jobEditForm">
     <input type="hidden" asp-for="Id" />
      @await Html.PartialAsync("_FormValidationSummary")
 
@@ -51,7 +51,7 @@
 
     <div class="row">
         <div class="col-md-6 mb-3">
-            <label class="form-label">Client Evaluation</label>
+            <label class="form-label">Client Evaluation <span class="text-danger">*</span></label>
             <div class="form-check">
                 <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="true" id="clientEvalYes" />
                 <label class="form-check-label" for="clientEvalYes">Yes</label>
@@ -60,6 +60,7 @@
                 <input class="form-check-input" type="radio" asp-for="ClientEvaluation" value="false" id="clientEvalNo" />
                 <label class="form-check-label" for="clientEvalNo">No</label>
             </div>
+            <span asp-validation-for="ClientEvaluation" class="text-danger" id="clientEvalError"></span>
         </div>
         <div class="col-md-6 mb-3">
             <label asp-for="ClientContract" class="form-label"></label>
@@ -97,37 +98,11 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
+    <script src="~/js/radioValidation.js"></script>
+    
     <script>
-        (function () {
-            var summary = document.getElementById('validationSummary');
-
-            function applyInvalidState() {
-                var lis = summary.querySelectorAll('li');
-                if (lis.length) {
-                    summary.classList.remove('d-none');
-                }
-                var errors = document.querySelectorAll('.text-danger');
-                errors.forEach(function (err) {
-                    if (err.textContent.trim().length > 0) {
-                        var container = err.closest('.mb-3');
-                        if (container) {
-                            var input = container.querySelector('input, textarea, select');
-                            if (input) input.classList.add('is-invalid');
-                        }
-                    }
-                });
-            }
-
-            document.addEventListener('DOMContentLoaded', function () {
-                applyInvalidState();
-                var form = document.querySelector('form[asp-action="Edit"]') || document.querySelector('form');
-                if (form) {
-                    form.addEventListener('submit', function () {
-                        setTimeout(applyInvalidState, 50);
-                    });
-                }
-            });
-        })();
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeClientEvaluationValidation('jobEditForm');
+        });
     </script>
 }

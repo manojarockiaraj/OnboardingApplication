@@ -1,0 +1,109 @@
+﻿@model OnboardingApp.Models.Candidate
+
+@if (Model != null)
+{
+    <div class="card shadow-sm mb-5">
+        <!-- Header -->
+        <div class="card-header bg-light border-bottom py-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-vcard text-muted me-2 fs-5"
+                   aria-label="Candidate Profile"
+                   title="Candidate Profile"></i>
+                <h5 class="mb-0 fw-bold">@Model.Name</h5>
+            </div>
+        </div>
+
+
+        <!-- Body -->
+        <div class="card-body px-4 py-4">
+            <div class="row g-4">
+
+                <!-- Employee ID -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-person-badge text-primary me-3 fs-5"></i>
+                        <div>
+                            <div class="text-muted small">Employee ID</div>
+                            <div class="fw-semibold">@Model.EmployeeId</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-envelope text-primary me-3 fs-5"></i>
+                        <div>
+                            <div class="text-muted small">Email</div>
+                            <div class="fw-semibold">@Model.Email</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-briefcase text-primary me-3 fs-5"></i>
+                        <div>
+                            <div class="text-muted small">Skills</div>
+                            <div class="fw-semibold">@Model.Skills</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-telephone text-primary me-3 fs-5"></i>
+                        <div>
+                            <div class="text-muted small">Phone</div>
+                            <div class="fw-semibold">@Model.Phone</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-geo-alt text-primary me-3 fs-5"></i>
+                        <div>
+                            <div class="text-muted small">Location</div>
+                            <div class="fw-semibold">@Model.Location</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Availability -->
+                <div class="col-md-6">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-calendar-check text-primary me-3 fs-5"></i>
+                        <div>
+                            <div class="text-muted small mb-1">Available for Interview</div>
+                            @if (Model.AvailableForInterview.HasValue && Model.AvailableForInterview.Value)
+                            {
+                                <span class="badge bg-success px-3 py-2">Yes</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger px-3 py-2">No</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary (full width) -->
+                <div class="col-12">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-card-text text-primary me-3 fs-5"></i>
+                        <div>
+                            <div class="text-muted small mb-1">Summary</div>
+                            <div class="fw-semibold">@Model.Summary</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+}

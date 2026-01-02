@@ -12,11 +12,12 @@ namespace OnboardingApp.Controllers;
 
 public class AccountController : Controller
 {
-    private static readonly List<(string Username, string Password)> _demoUsers = new()
+    private readonly List<DemoUserConfig> _demoUsers;
+
+    public AccountController(List<DemoUserConfig> demoUsers)
     {
-        ("admin", "password"),
-        ("user", "password")
-    };
+        _demoUsers = demoUsers ?? new List<DemoUserConfig>();
+    }
 
     [AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
@@ -45,7 +46,7 @@ public class AccountController : Controller
         if (user == null)
         {
             var demo = _demoUsers.FirstOrDefault(u => u.Username == username && u.Password == password);
-            if (demo == default)
+            if (demo == null)
             {
                 ModelState.AddModelError(string.Empty, "Invalid username or password");
                 return View();
@@ -55,7 +56,9 @@ public class AccountController : Controller
                 // create a temporary identity for demo user
                 var claimsDemo = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, demo.Username)
+                    new Claim(ClaimTypes.Name, demo.Username),
+                    new Claim(ClaimTypes.Role, demo.Role),
+                    new Claim("DisplayName", demo.Username)
                 };
                 var identityDemo = new ClaimsIdentity(claimsDemo, "CookieAuth");
                 await HttpContext.SignInAsync("CookieAuth", new ClaimsPrincipal(identityDemo));
@@ -70,7 +73,8 @@ public class AccountController : Controller
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim("DisplayName", user.DisplayName ?? user.Username)
+            new Claim("DisplayName", user.DisplayName ?? user.Username),
+            new Claim(ClaimTypes.Role, user.Role ?? "Operation")
         };
 
         var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");
@@ -132,7 +136,8 @@ public class AccountController : Controller
             Username = username,
             PasswordHash = ComputeHash(password),
             DisplayName = displayName,
-            Email = email
+            Email = email,
+            Role = "Operation"
         };
 
         DataStore.Users.Add(user);
@@ -140,7 +145,8 @@ public class AccountController : Controller
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim("DisplayName", user.DisplayName ?? user.Username)
+            new Claim("DisplayName", user.DisplayName ?? user.Username),
+            new Claim(ClaimTypes.Role, user.Role)
         };
 
         var claimsIdentity = new ClaimsIdentity(claims, "CookieAuth");

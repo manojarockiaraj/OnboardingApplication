@@ -5,7 +5,14 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="mb-0">Job Listings</h1>
-    <a class="btn btn-primary btn-lg" asp-action="Create">+ Add Job</a>
+    @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Operation") || User.IsInRole("AccountManager")))
+    {
+        <a class="btn btn-primary btn-lg" asp-action="Create">+ Add Job</a>
+    }
+    else
+    {
+        <button class="btn btn-primary btn-lg" disabled>+ Add Job</button>
+    }
 </div>
 
 <div class="row row-cols-1 row-cols-md-2 g-4">
@@ -53,22 +60,37 @@
                             }
                         </li>
                         <li class="list-group-item">
-                            <i class="bi @(job.ClientEvaluation ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") me-2"></i>
-                            <strong>Client Evaluation:</strong> @(job.ClientEvaluation ? "Yes" : "No")
+                            <i class="bi @(job.ClientEvaluation == true ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") me-2"></i>
+                            <strong>Client Evaluation:</strong> @(job.ClientEvaluation == true ? "Yes" : job.ClientEvaluation == false ? "No" : "N/A")
                         </li>
                     </ul>
 
                     <!-- Action Buttons -->
                     <div class="mt-auto d-flex justify-content-end gap-2">
-                        <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@job.Id">Edit</a>
+                        @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("AccountManager") || User.IsInRole("Operation")))
+                        {
+                            <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@job.Id">Edit</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-secondary" disabled>Edit</button>
+                        }
 
                         <!-- View Button -->
                         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#viewJobModal-@job.Id">
                             View
                         </button>
 
-                        <a class="btn btn-sm btn-info" asp-controller="Candidates" asp-action="Create" asp-route-jobId="@job.Id">Add Candidate</a>
-                        <a class="btn btn-sm btn-info" asp-controller="Candidates" asp-action="AssignCandidates" asp-route-jobId="@job.Id">Assign Candidates</a>
+                        @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("AccountManager")))
+                        {
+                            <a class="btn btn-sm btn-info" asp-controller="Candidates" asp-action="Create" asp-route-jobId="@job.Id">Add Candidate</a>
+                            <a class="btn btn-sm btn-info" asp-controller="Candidates" asp-action="AssignCandidates" asp-route-jobId="@job.Id">Assign Candidates</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-info" disabled>Add Candidate</button>
+                            <button class="btn btn-sm btn-info" disabled>Assign Candidates</button>
+                        }
                     </div>
                 </div>
             </div>
@@ -131,8 +153,8 @@
                                 <i class="bi bi-gear-fill me-2"></i> <strong>Skills:</strong> @job.Skills
                             </li>
                             <li class="list-group-item">
-                                <i class="bi @(job.ClientEvaluation ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") me-2"></i>
-                                <strong>Client Evaluation:</strong> @(job.ClientEvaluation ? "Yes" : "No")
+                                <i class="bi @(job.ClientEvaluation == true ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") me-2"></i>
+                                <strong>Client Evaluation:</strong> @(job.ClientEvaluation == true ? "Yes" : job.ClientEvaluation == false ? "No" : "N/A")
                             </li>
                         </ul>
                     </div>

@@ -4,6 +4,7 @@ using OnboardingApp.Data;
 using OnboardingApp.Models;
 using OnboardingApp.Repositories;
 using OnboardingApp.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OnboardingApp.Controllers;
 
@@ -26,65 +27,10 @@ public class CandidatesController : Controller
     {
         var candidates = await _candidateRepository.GetAllAsync();
         ViewData["JobId"] = jobId;
-
-        //if (jobId.HasValue)
-        //{
-        //    var job = await _jobRepository.GetByIdAsync(jobId.Value);
-        //    if (job != null)
-        //    {
-        //        ViewData["JobTitle"] = string.Concat(job.Title," ", job.Skills);
-        //        var jobSkills = job.Skills.Split(',').Select(s => s.Trim().ToLower()).Where(s => s.Length > 0).ToList();
-        //        candidates = candidates.Where(c =>
-        //            c.Skills.Split(',').Select(s => s.Trim().ToLower()).Any(s => jobSkills.Contains(s))
-        //        ).ToList();
-
-        //        if(candidates.Any())
-        //            candidates[0].JobPostingDetails = job;
-        //    }
-        //}
-
-        foreach(var c in candidates)
-        {
-           // candidates.CandidateStatusEvaluations = _candidateRepository.GetCandidateEvaluation(c.Id, c.JobPostingDetails.Id);
-        }
-           
-
-        //var candidates = await _candidateRepository.GetAllAsync();
-        //ViewData["JobId"] = jobId;
-
-        //if (jobId.HasValue)
-        //{
-        //    var job = await _jobRepository.GetByIdAsync(jobId.Value);
-        //    if (job != null)
-        //    {
-        //        ViewData["JobTitle"] = job.Title;
-
-        //        // Prepare job skills for comparison
-        //        var jobSkills = job.Skills
-        //            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-        //            .Select(s => s.Trim().ToLower())
-        //            .ToList();
-
-        //        // Filter candidates based on matching skills
-        //        candidates = candidates
-        //            .Where(c => c.Skills
-        //                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-        //                .Select(s => s.Trim().ToLower())
-        //                .Any(s => jobSkills.Contains(s)))
-        //            .ToList();
-
-        //        // Update each candidate with their evaluation for this job
-        //        foreach (var candidate in candidates)
-        //        {
-        //            candidate.CandidateStatusEvaluations = await _candidateRepository.GetCandidateEvaluation(candidate.Id, jobId.Value);
-        //        }
-        //    }
-        //}
-
-
         return View(candidates);
     }
 
+    [Authorize(Roles = "AccountManager")]
     public async Task<IActionResult> AssignCandidates(int jobId)
     {
         var candidates = await _candidateRepository.GetAllAsync();
@@ -106,48 +52,10 @@ public class CandidatesController : Controller
             }
         }
 
-        foreach (var c in candidates)
-        {
-            // candidates.CandidateStatusEvaluations = _candidateRepository.GetCandidateEvaluation(c.Id, c.JobPostingDetails.Id);
-        }
-
-
-        //var candidates = await _candidateRepository.GetAllAsync();
-        //ViewData["JobId"] = jobId;
-
-        //if (jobId.HasValue)
-        //{
-        //    var job = await _jobRepository.GetByIdAsync(jobId.Value);
-        //    if (job != null)
-        //    {
-        //        ViewData["JobTitle"] = job.Title;
-
-        //        // Prepare job skills for comparison
-        //        var jobSkills = job.Skills
-        //            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-        //            .Select(s => s.Trim().ToLower())
-        //            .ToList();
-
-        //        // Filter candidates based on matching skills
-        //        candidates = candidates
-        //            .Where(c => c.Skills
-        //                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-        //                .Select(s => s.Trim().ToLower())
-        //                .Any(s => jobSkills.Contains(s)))
-        //            .ToList();
-
-        //        // Update each candidate with their evaluation for this job
-        //        foreach (var candidate in candidates)
-        //        {
-        //            candidate.CandidateStatusEvaluations = await _candidateRepository.GetCandidateEvaluation(candidate.Id, jobId.Value);
-        //        }
-        //    }
-        //}
-
-
         return View(candidates);
     }
 
+    [Authorize(Roles = "AccountManager")]
     public async Task<IActionResult> MapEmployeeToJob(int id, int? jobId)
     {
 
@@ -172,7 +80,6 @@ public class CandidatesController : Controller
 
         return View(candidate);
     }
-
 
     public async Task<IActionResult> Overview()
     {
@@ -202,7 +109,7 @@ public class CandidatesController : Controller
             Name = x.Candidate.Name,
             Email = x.Candidate.Email,
             AppliedFor = x.JobPosting.Skills, // or JobTitle, whichever you prefer
-            
+            Acknowledgement = x.Candidate.AcknowledgmentConfirmed,
 
             // Status fields
             ResumeStatus = x.Evaluation?.ResumeStatus.ToString() ?? "Submitted",
@@ -241,6 +148,7 @@ public class CandidatesController : Controller
         return View(candidate);
     }
 
+    [Authorize(Roles = "AccountManager")]
     public async Task<IActionResult> EditStatus(int id, int? jobId)
     {
         var candidate = await _candidateRepository.GetByIdAsync(id);
@@ -264,6 +172,7 @@ public class CandidatesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "AccountManager")]
         public async Task<IActionResult> EditStatus(int id, Candidate updated, int? jobId)
         {
             if (id != updated.Id) return BadRequest();
@@ -286,55 +195,27 @@ public class CandidatesController : Controller
             var candidateFromDb = await _candidateRepository.GetByIdAsync(id);
             if (candidateFromDb == null) return NotFound();
 
-            // Update DB-backed candidate where possible
-            //candidateFromDb.Name = updated.Name;
-            //// only map fields that are persisted in DB table
-            //candidateFromDb.Skills = updated.Skills;
-            //candidateFromDb.Email = updated.Email;
-            //candidateFromDb.Phone = updated.Phone;
-            //candidateFromDb.Location = updated.Location;
-            //candidateFromDb.Summary = updated.Summary;
-            //candidateFromDb.AvailableForInterview = updated.AvailableForInterview;
+            var evaluation = new CandidateStatusEvaluation
+            {
+                CandidateId = candidateFromDb.Id,
+                JobPostingId = jobId.Value,
+                ResumeStatus = updated.ResumeFilterStatus,
+                CtsInternalInterviewStatus = updated.Level1Status,
+                ClientInterviewStatus = updated.Level2Status,
+                FinalStatus = updated.FinalStatus,
+                SecurityCheckStatus = updated.BpssStatus,
+                CtsInternalInterviewerName = updated.CTSInternalInterviewerName,
+                ClientInterviewerName = updated.ClientInterviewerName
+            };
 
-            //await _candidateRepository.UpdateAsync(candidateFromDb);
-
-        // Also update in-memory DataStore to keep existing app behavior for status fields
-        //var candidateInStore = DataStore.Candidates.FirstOrDefault(c => c.Id == id);
-        //if (candidateInStore != null)
-        //{
-        //    candidateInStore.Name = updated.Name;
-        //    candidateInStore.ResumeFilterStatus = updated.ResumeFilterStatus;
-        //    candidateInStore.Level1Status = updated.Level1Status;
-        //    candidateInStore.Level2Status = updated.Level2Status;
-        //    candidateInStore.FinalStatus = updated.FinalStatus;
-        //    candidateInStore.BpssStatus = updated.BpssStatus;
-
-        //    candidateInStore.CTSInternalInterviewerName = updated.CTSInternalInterviewerName;
-        //    candidateInStore.ClientInterviewerName = updated.ClientInterviewerName;
-        //}
-
-        //await _candidateRepository.UpdateAsync(candidateFromDb);
-
-        var evaluation = new CandidateStatusEvaluation
-        {
-            CandidateId = candidateFromDb.Id,
-            JobPostingId = jobId.Value,
-            ResumeStatus = updated.ResumeFilterStatus,
-            CtsInternalInterviewStatus = updated.Level1Status,
-            ClientInterviewStatus = updated.Level2Status,
-            FinalStatus = updated.FinalStatus,
-            SecurityCheckStatus = updated.BpssStatus,
-            CtsInternalInterviewerName = updated.CTSInternalInterviewerName,
-            ClientInterviewerName = updated.ClientInterviewerName
-        };
-
-        await _candidateRepository. AddOrUpdateCandidateStatusAsync(evaluation);
+            await _candidateRepository. AddOrUpdateCandidateStatusAsync(evaluation);
 
 
-        return RedirectToAction(nameof(Details), new { id = candidateFromDb.Id, jobId = jobId });
+            return RedirectToAction(nameof(Details), new { id = candidateFromDb.Id, jobId = jobId });
         }
 
     [HttpPost]
+    [Authorize(Roles = "AccountManager")]
     public async Task<IActionResult> UpdateResumeStatus(int JobPostingId, List<Candidate> Candidates)
     {
         List<string> _error = new List<string>();
@@ -373,6 +254,7 @@ public class CandidatesController : Controller
         return RedirectToAction("Index", new { jobId = JobPostingId });
     }
 
+    [Authorize(Roles = "AccountManager")]
     public async Task<IActionResult> AllocateCandidate(int jobPostingId, int candidateId)
     {
         var candidateFromDb = await _candidateRepository.GetByIdAsync(candidateId);
@@ -399,8 +281,10 @@ public class CandidatesController : Controller
 
     }
 
+    [Authorize(Roles = "Operation,AccountManager")]
     public async Task<IActionResult> Create(int? jobId = null)
     {
+        PopulateGradeDropdown();
         if (jobId.HasValue)
         {
             var candidate = new Candidate();
@@ -416,10 +300,12 @@ public class CandidatesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Operation,AccountManager")]
     public async Task<IActionResult> Create(Candidate candidate, int? jobId = null)
     {
         if (!ModelState.IsValid)
         {
+            PopulateGradeDropdown();
             return View(candidate);
         }
 
@@ -434,44 +320,48 @@ public class CandidatesController : Controller
         }
     }
 
+    [Authorize(Roles = "Operation,AccountManager")]
     public async Task<IActionResult> Edit(int id)
     {
         var candidate = await _candidateRepository.GetByIdAsync(id);
         if (candidate == null)
             return NotFound();
 
+        PopulateGradeDropdown();
         return View(candidate);
     }
 
     // POST: Candidates/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Operation,AccountManager")]
     public async Task<IActionResult> Edit(int id, Candidate candidate)
     {
         if (id != candidate.Id)
             return BadRequest();
 
         if (!ModelState.IsValid)
+        {
+            PopulateGradeDropdown();
             return View(candidate);
+        }
 
         await _candidateRepository.UpdateAsync(candidate);
         return RedirectToAction(nameof(Index));
     }
 
+    private void PopulateGradeDropdown()
+    {
+        ViewBag.Grades = EmployeeGrades.All;
+    }
 
-[HttpPost]
+    [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "AccountManager")]
     public async Task<IActionResult> SubmitOnboarding(int id)
     {
         var candidate = await _candidateRepository.GetByIdAsync(id);
         if (candidate == null) return NotFound();
-
-        // Only allow if FinalStatus and BpssStatus are Passed
-        //if (candidate.FinalStatus != StageStatus.Passed || candidate.BpssStatus != StageStatus.Passed)
-        //{
-        //    TempData["Error"] = "Candidate must have Final Status and BPSS Status as Passed to submit onboarding request.";
-        //    return RedirectToAction(nameof(Details), new { id = id });
-        //}
 
         try
         {

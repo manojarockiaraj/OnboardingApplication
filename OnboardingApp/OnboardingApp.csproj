@@ -18,8 +18,10 @@
 
  <ItemGroup>
    <None Remove="Helper\" />
+   <None Remove="Views\OnBoarding\" />
  </ItemGroup>
  <ItemGroup>
    <Folder Include="Helper\" />
+   <Folder Include="Views\OnBoarding\" />
  </ItemGroup>
 </Project>

@@ -16,4 +16,7 @@ public class User
 
     [EmailAddress]
     public string? Email { get; set; }
+
+    // Role for the user (e.g. "Operation" or "Account Manager")
+    public string Role { get; set; } = "Operation";
 }

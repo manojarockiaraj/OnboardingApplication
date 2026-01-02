@@ -11,6 +11,10 @@
         <h3 class="section-title"></h3>
     </div>
     <div class="card-content">
-        @await Html.PartialAsync("_OnBoardingChecklist", ViewData["OnBoardingItems"] as IEnumerable<OnboardingApp.Models.OnBoardingList>)
+        @await Html.PartialAsync("_OnBoardingChecklist", new ViewDataDictionary(ViewData)
+   {
+       ["Candidate"] = ViewData["Candidate"],
+       ["OnBoardingItems"] = ViewData["OnBoardingItems"]
+   })
     </div>
 </div>
