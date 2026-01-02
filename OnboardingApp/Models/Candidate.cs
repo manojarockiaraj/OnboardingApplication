@@ -12,7 +12,7 @@ public class Candidate
     [Column("employeeid")]
     [Required(ErrorMessage = "Employee Id is Mandatory")]
     [RegularExpression(@"^[0-9]+$", ErrorMessage = "Employee Id must contain only numbers")]
-    public int EmployeeId { get; set; }
+    public int? EmployeeId { get; set; }
 
     [Column("fullname")]
     [Required(ErrorMessage = "Full name is required")]

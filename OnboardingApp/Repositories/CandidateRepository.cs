@@ -24,10 +24,11 @@ public class CandidateRepository : ICandidateRepository
         return await _db.Candidates.FindAsync(id);
     }
 
-    public async Task AddAsync(Candidate candidate)
+    public async Task<int> AddAsync(Candidate candidate)
     {
         _db.Candidates.Add(candidate);
         await _db.SaveChangesAsync();
+        return candidate.Id;
     }
 
      public async Task UpdateAsync(Candidate candidate)

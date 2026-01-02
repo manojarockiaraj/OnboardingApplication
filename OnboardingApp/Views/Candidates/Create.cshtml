@@ -6,7 +6,11 @@
 
 <h2>Add Candidate</h2>
 
-<form asp-action="Create" method="post" id="candidateCreateForm">
+<form asp-action="Create" method="post" asp-route-jobId="@Model?.JobPostingDetails?.Id" id="candidateCreateForm">
+    @if (Model?.JobPostingDetails != null)
+    {
+        @await Html.PartialAsync("_JobProfile", Model.JobPostingDetails)
+    }
     <div class="row g-3">
         <!-- Employee Info Card -->
         <div class="col-md-6">
