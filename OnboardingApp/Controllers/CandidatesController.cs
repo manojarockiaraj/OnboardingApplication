@@ -449,18 +449,7 @@ public class CandidatesController : Controller
 
     private void PopulateGradeDropdown()
     {
-        ViewBag.Grades = new List<string>
-        {
-            "Associate",
-            "Senior Associate",
-            "Manager",
-            "Senior Manager",
-            "Tech Lead",
-            "Architect",
-            "Senior Architect",
-            "Vice President",
-            "President"
-        };
+        ViewBag.Grades = EmployeeGrades.All;
     }
 
     [HttpPost]
