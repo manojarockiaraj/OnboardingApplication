@@ -224,6 +224,7 @@ else
     <form asp-action="SubmitOnboarding" method="post">
         <input type="hidden" name="id" value="@Model.Id" />
 
+      
         @if (isAccountManager)
         {
             <button type="submit" class="btn btn-success me-2" @(canSubmit ? "" : "disabled")>Submit Onboarding Request</button>

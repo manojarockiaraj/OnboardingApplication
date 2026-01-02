@@ -8,7 +8,7 @@ public class CandidateOverviewViewModel
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string AppliedFor { get; set; } = string.Empty; // using Skills for demo
-
+    public bool Acknowledgement { get; set; }
     // Status fields from CandidateStatus
     public string? ResumeStatus { get; set; }
     public string? CtsInternalInterviewStatus { get; set; }

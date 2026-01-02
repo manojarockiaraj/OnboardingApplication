@@ -25,8 +25,8 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         // Get onboarding items
-        var onboardingItems = await _onboardRepo.GetAllAsync();
-        ViewData["OnBoardingItems"] = onboardingItems;
+        //var onboardingItems = await _onboardRepo.GetAllAsync();
+        //ViewData["OnBoardingItems"] = onboardingItems;
 
         // Get job postings count
         var jobPostings = await _jobRepo.GetAllAsync();

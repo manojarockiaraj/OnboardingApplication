@@ -109,7 +109,7 @@ else
         <form asp-action="AllocateCandidate" method="post" class="me-2">
             <input type="hidden" name="candidateId" value="@Model.Id" />
             <input type="hidden" name="jobPostingId" value="@ViewData["JobId"]" />
-            <button type="submit" class="btn btn-success">Assign</button>
+            <button type="submit" class="btn btn-success">Initiate Evaluation Process</button>
         </form>
 
         <a class="btn btn-secondary" asp-action="AssignCandidates" asp-route-jobId="@ViewData["JobId"]">Back</a>

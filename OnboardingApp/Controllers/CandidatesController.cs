@@ -109,7 +109,7 @@ public class CandidatesController : Controller
             Name = x.Candidate.Name,
             Email = x.Candidate.Email,
             AppliedFor = x.JobPosting.Skills, // or JobTitle, whichever you prefer
-            
+            Acknowledgement = x.Candidate.AcknowledgmentConfirmed,
 
             // Status fields
             ResumeStatus = x.Evaluation?.ResumeStatus.ToString() ?? "Submitted",
