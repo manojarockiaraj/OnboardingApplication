@@ -79,6 +79,10 @@ public class AppDbContext : DbContext
           .HasColumnName("fullname")
           .HasMaxLength(150);
 
+            entity.Property(e => e.Grade)
+          .HasColumnName("grade")
+          .HasMaxLength(50);
+
     entity.Property(e => e.Skills)
           .HasColumnName("skillset")
           .HasMaxLength(500);
@@ -103,15 +107,7 @@ public class AppDbContext : DbContext
 
             entity.Property(e => e.Summary)
           .HasColumnName("profilesummary");
-            //entity.Property(e => e.CTSInternalInterviewerName).HasColumnName("ctsinternalinterviewername");
-            //entity.Property(e => e.ClientInterviewerName).HasColumnName("clientinterviewername");
-            //entity.Property(e => e.ResumeFilterStatus).HasColumnName("resumefilterstatus");
-            //entity.Property(e => e.Level1Status).HasColumnName("level1status");
-            //entity.Property(e => e.Level2Status).HasColumnName("level2status");
-            //entity.Property(e => e.FinalStatus).HasColumnName("finalstatus");
-            //entity.Property(e => e.BpssStatus).HasColumnName("bpssstatus");
         });
-
         
 
         modelBuilder.Entity<CandidateStatusEvaluation>(entity =>

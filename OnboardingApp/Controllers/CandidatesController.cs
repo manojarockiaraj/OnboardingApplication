@@ -401,6 +401,7 @@ public class CandidatesController : Controller
 
     public IActionResult Create()
     {
+        PopulateGradeDropdown();
         return View();
     }
 
@@ -410,6 +411,7 @@ public class CandidatesController : Controller
     {
         if (!ModelState.IsValid)
         {
+            PopulateGradeDropdown();
             return View(candidate);
         }
 
@@ -423,6 +425,7 @@ public class CandidatesController : Controller
         if (candidate == null)
             return NotFound();
 
+        PopulateGradeDropdown();
         return View(candidate);
     }
 
@@ -435,14 +438,32 @@ public class CandidatesController : Controller
             return BadRequest();
 
         if (!ModelState.IsValid)
+        {
+            PopulateGradeDropdown();
             return View(candidate);
+        }
 
         await _candidateRepository.UpdateAsync(candidate);
         return RedirectToAction(nameof(Index));
     }
 
+    private void PopulateGradeDropdown()
+    {
+        ViewBag.Grades = new List<string>
+        {
+            "Associate",
+            "Senior Associate",
+            "Manager",
+            "Senior Manager",
+            "Tech Lead",
+            "Architect",
+            "Senior Architect",
+            "Vice President",
+            "President"
+        };
+    }
 
-[HttpPost]
+    [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SubmitOnboarding(int id)
     {

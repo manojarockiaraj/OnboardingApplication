@@ -24,10 +24,12 @@ public class JobPosting
 
     [Display(Name = "Start Date")]
     [DataType(DataType.Date)]
+    [Required(ErrorMessage = "Start Date is required")]
     public DateTime? StartDate { get; set; }
 
     [Display(Name = "Client Evaluation")]
-    public bool ClientEvaluation { get; set; }
+    [Required(ErrorMessage = "Please select whether Client Evaluation is required")]
+    public bool? ClientEvaluation { get; set; }
 
     [Display(Name = "Client Contract")]
     public string ClientContract { get; set; } = string.Empty; // e.g. "Multicapability", "ESFA"
