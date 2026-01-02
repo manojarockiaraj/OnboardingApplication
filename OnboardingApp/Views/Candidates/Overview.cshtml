@@ -65,6 +65,7 @@
             <th>Applied For</th>
             <th>Status</th>
             <th> Acknowledge</th>
+            <th>Onboarding Request Sent</th>
             <th style="width:120px; text-align:right">Actions</th>
         </tr>
     </thead>
@@ -93,6 +94,11 @@
                     {
                         <span class="text-success fw-bold">&#10004;</span> <!-- ✔ -->
                     }
+                </td>
+                <td class="text-center">
+                    <span class="badge @(item.OnboardingRequestSent ?? false ? "bg-success" : "bg-secondary")">
+                        @((item.OnboardingRequestSent ?? false) ? "Yes" : "No")
+                    </span>
                 </td>
                 <td style="text-align:right">
                     <div class="dropdown">

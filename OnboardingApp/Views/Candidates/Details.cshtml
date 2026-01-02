@@ -12,8 +12,10 @@
     bool canSubmit = false;
     if (evaluation != null)
     {
-        canSubmit = (evaluation.CtsInternalInterviewStatus == OnboardingApp.Models.CtsInternalInterviewStatus.Completed || 
-            evaluation.CtsInternalInterviewStatus == OnboardingApp.Models.CtsInternalInterviewStatus.Selected) && evaluation.SecurityCheckStatus == OnboardingApp.Models.SecurityCheckStatus.Cleared;
+        // OnboardingRequestSent is nullable bool; allow submit only if not already sent
+        canSubmit = (evaluation.CtsInternalInterviewStatus == OnboardingApp.Models.CtsInternalInterviewStatus.Completed || evaluation.CtsInternalInterviewStatus == OnboardingApp.Models.CtsInternalInterviewStatus.Selected)
+        && evaluation.SecurityCheckStatus == OnboardingApp.Models.SecurityCheckStatus.Cleared
+        && (evaluation.OnboardingRequestSent != true);
     }
 }
 
@@ -218,18 +220,41 @@ else
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <h6 class="text-muted"><i class="bi bi-envelope-check me-1"></i>Onboarding Request</h6>
+                    @{ var sentText = evaluation.OnboardingRequestSent == true ? "Yes" : "No"; }
+                    <span class="badge @GetStatusBadgeClass((evaluation.OnboardingRequestSent == true).ToString())">
+                        @sentText
+                    </span>
+                    @if (evaluation.OnboardingRequestDate.HasValue)
+                    {
+                        <div class="small text-muted mt-2">@evaluation.OnboardingRequestDate.Value.ToString("yyyy-MM-dd HH:mm")</div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Actions -->
     <form asp-action="SubmitOnboarding" method="post">
         <input type="hidden" name="id" value="@Model.Id" />
+        <input type="hidden" name="jobId" value="@ViewData["JobId"]" />
 
-      
         @if (isAccountManager)
         {
             <button type="submit" class="btn btn-success me-2" @(canSubmit ? "" : "disabled")>Submit Onboarding Request</button>
 
-            <a class="btn btn-primary me-2" asp-action="EditStatus" asp-route-id="@Model.Id" asp-route-jobId="@ViewData["JobId"]">Edit Status</a>
+            @* disable Edit Status when onboarding request has been sent *@
+            @if (evaluation.OnboardingRequestSent != true)
+            {
+                <a class="btn btn-primary me-2" asp-action="EditStatus" asp-route-id="@Model.Id" asp-route-jobId="@ViewData["JobId"]">Edit Status</a>
+            }
+            else
+            {
+                <button class="btn btn-primary me-2" disabled>Edit Status</button>
+            }
         }
         else
         {

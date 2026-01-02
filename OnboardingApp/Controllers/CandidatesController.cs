@@ -341,21 +341,60 @@ public class CandidatesController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = "AccountManager")]
-    public async Task<IActionResult> SubmitOnboarding(int id)
+    public async Task<IActionResult> SubmitOnboarding(int id, int? jobId)
     {
+        if (!jobId.HasValue)
+            return BadRequest("jobId is required");
+
         var candidate = await _candidateRepository.GetByIdAsync(id);
         if (candidate == null) return NotFound();
 
+        // Update or create evaluation record to mark onboarding request sent
         try
         {
-            await _emailService.SendOnboardingRequestAsync(candidate);
-            TempData["Success"] = "Onboarding request submitted via email.";
+            var existingList = await _candidateRepository.GetCandidateEvaluation(id, jobId.Value);
+            var existing = existingList?.FirstOrDefault();
+
+            if (existing != null)
+            {
+                existing.OnboardingRequestSent = true;
+                existing.OnboardingRequestDate = DateTime.UtcNow;
+                existing.UpdatedDate = DateTime.UtcNow;
+
+                await _candidateRepository.AddOrUpdateCandidateStatusAsync(existing);
+            }
+            else
+            {
+                var evaluation = new CandidateStatusEvaluation
+                {
+                    CandidateId = candidate.Id,
+                    JobPostingId = jobId.Value,
+                    OnboardingRequestSent = true,
+                    OnboardingRequestDate = DateTime.UtcNow,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow
+                };
+
+                await _candidateRepository.AddOrUpdateCandidateStatusAsync(evaluation);
+            }
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Failed to send onboarding email: {ex.Message}";
+            TempData["Error"] = $"Failed to update onboarding request in database: {ex.Message}";
+            return RedirectToAction(nameof(Details), new { id = id, jobId = jobId });
         }
 
-        return RedirectToAction(nameof(Details), new { id = id });
+        // Attempt to send onboarding email (do not rollback DB on failure)
+        //try
+        //{
+        //    await _emailService.SendOnboardingRequestAsync(candidate);
+        //    TempData["Success"] = "Onboarding request submitted via email.";
+        //}
+        //catch (Exception ex)
+        //{
+        //    TempData["Error"] = $"Failed to send onboarding email: {ex.Message}";
+        //}
+
+        return RedirectToAction(nameof(Details), new { id = id, jobId = jobId });
     }
 }
