@@ -35,7 +35,7 @@
             <td>@job.ClientContact</td>
             <td>@job.Location</td>
             <td>@(job.StartDate?.ToString("yyyy-MM-dd") ?? "")</td>
-            <td>@(job.ClientEvaluation ? "Yes" : "No")</td>
+            <td>@(job.ClientEvaluation == true ? "Yes" : job.ClientEvaluation == false ? "No" : "N/A")</td>
             <td>@job.ClientContract</td>
             <td>@job.WorkModel</td>
             <td>

@@ -19,6 +19,11 @@ public class Candidate
     [StringLength(150)]
     public string? Name { get; set; }
 
+    [Column("grade")]
+    [Required(ErrorMessage = "Grade is required")]
+    [StringLength(50)]
+    public string? Grade { get; set; }
+
     [StringLength(500, ErrorMessage = "Skills cannot exceed 500 characters")]
     [Column("skillset")]
     [Required(ErrorMessage = "Skills is required")]
@@ -32,16 +37,18 @@ public class Candidate
     public string? Email { get; set; }
 
     [Phone(ErrorMessage = "Invalid phone number")]
+    [Required(ErrorMessage = "Phone is required")]
     [Column("contactphone")]
     [StringLength(20)]
     public string? Phone { get; set; }
 
     [Column("residence")]
+    [Required(ErrorMessage = "Location is required")]
     [StringLength(150)]
     public string? Location { get; set; }
 
     [Column("availableforinterview")]
-    [Required(ErrorMessage = "Please select Yes or No")]
+    [Required(ErrorMessage = "Please select whether available for interview")]
     public bool? AvailableForInterview { get; set; }
 
     [StringLength(2000, ErrorMessage = "Summary is too long")]
@@ -90,4 +97,3 @@ public class Candidate
 
     public List<CandidateStatusEvaluation>? CandidateStatusEvaluations { get; set; }
 }
-        

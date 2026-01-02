@@ -6,7 +6,7 @@
 
 <h2>Edit Candidate</h2>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" id="candidateEditForm">
     <input type="hidden" asp-for="Id" />
 
     <div class="row g-3">
@@ -26,6 +26,13 @@
                         <label asp-for="Name" class="form-label">Name</label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Grade" class="form-label">Grade</label>
+                        <select asp-for="Grade" class="form-select" asp-items="new SelectList(ViewBag.Grades)">
+                            <option value="">-- Select Grade --</option>
+                        </select>
+                        <span asp-validation-for="Grade" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -70,7 +77,7 @@
                         <span asp-validation-for="Skills" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label d-block">Available For Interview</label>
+                        <label class="form-label d-block">Available For Interview <span>*</span></label>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input"
                                    type="radio"
@@ -87,7 +94,9 @@
                                    id="availableNo" />
                             <label class="form-check-label" for="availableNo">No</label>
                         </div>
-                        <span asp-validation-for="AvailableForInterview" class="text-danger"></span>
+                        <div>
+                            <span asp-validation-for="AvailableForInterview" class="text-danger d-block" id="availableForInterviewError"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,4 +130,11 @@
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script src="~/js/radioValidation.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeAvailableForInterviewValidation('candidateEditForm');
+        });
+    </script>
 }
